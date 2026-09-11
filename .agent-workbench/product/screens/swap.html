@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vetted — Guarded swap</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  /* Layout only — all colors/fonts/spacing from theme.css */
+  .wrap { max-width: 760px; margin: 0 auto; padding: var(--s6) var(--s5); }
+  .state { margin-bottom: var(--s7); }
+  .state > .label { display: block; margin-bottom: var(--s3); }
+  .field { margin-bottom: var(--s3); }
+  .field .label { display:block; margin-bottom: var(--s1); }
+  .field .input { width: 100%; }
+  .swaprow { display:flex; gap: var(--s3); align-items:center; }
+  header.bar { display:flex; align-items:center; justify-content:space-between; padding: var(--s4) 0; border-bottom: 1px solid var(--border); margin-bottom: var(--s6); }
+  header.bar nav { display:flex; gap: var(--s4); font-size: var(--fs-1); }
+  h1 { font-size: var(--fs-4); margin: 0 0 var(--s3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="bar">
+  <div style="display:flex; align-items:center; gap: var(--s3);">
+    <span class="mono" style="font-size: var(--fs-3); font-weight:700;">vetted_</span>
+    <nav><a href="scan.html">Scan</a><a href="swap.html">Swap</a><a href="registry.html">Registry</a></nav>
+  </div>
+  <span class="chip mono">● Robinhood Chain · 4663</span>
+</header>
+
+<!-- ============ STATE: CONNECT ============ -->
+<div class="state">
+  <span class="label">state — not connected</span>
+  <div class="panel">
+    <h1>Guarded swap</h1>
+    <p class="muted" style="font-size: var(--fs-1);">This swap settles only tokens with a live verification record. At execution the guard re-runs every check on-chain and reverts on any deterministic red flag — your funds never move on a revert.</p>
+    <button class="btn ghost">Connect wallet</button>
+  </div>
+</div>
+
+<!-- ============ STATE: WRONG NETWORK ============ -->
+<div class="state">
+  <span class="label">state — wrong network</span>
+  <div class="panel">
+    <h1>Guarded swap</h1>
+    <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);">Wallet is connected to <strong>Arbitrum Sepolia</strong> — switch to Robinhood Chain · 4663 to quote. Stock-token verdicts and the Canonical Registry live on 4663; funds never move on a revert.</p>
+    <button class="btn ghost">Switch to Robinhood Chain · 4663</button>
+  </div>
+</div>
+
+<!-- ============ STATE: PRE-FLIGHT ============ -->
+<div class="state">
+  <span class="label">state — pre-flight preview</span>
+  <div class="panel">
+    <h1>Guarded swap</h1>
+    <div class="field">
+      <span class="label">you pay</span>
+      <div class="swaprow"><input class="input" type="text" value="1,250"><span class="mono muted">USDG</span></div>
+    </div>
+    <div class="field">
+      <span class="label">you receive — any token address accepted</span>
+      <input class="input mono" type="text" value="NVIDIA · NVDA — 0x9f8c…d2e4" spellcheck="false">
+    </div>
+    <div class="panel" style="background: var(--bg-inset); margin: var(--s4) 0;">
+      <div class="label" style="margin-bottom: var(--s2);">guard checks — these run again on-chain at execution</div>
+      <div class="check-row"><span class="mono" style="color: var(--verified);">✓</span><span>Live verification record in Canonical Registry</span><span class="mono">verified 2026-08-30</span></div>
+      <div class="check-row"><span class="mono" style="color: var(--verified);">✓</span><span>Token not paused</span><span class="mono">paused() → false</span></div>
+      <div class="check-row"><span class="mono" style="color: var(--verified);">✓</span><span>Buyer not blocklisted</span><span class="mono">isBlocked(buyer) → false</span></div>
+      <div class="check-row"><span class="mono" style="color: var(--verified);">✓</span><span>Implementation matches registry record</span><span class="mono">0x77be… = 0x77be…</span></div>
+    </div>
+    <button class="btn danger">Swap guarded</button>
+    <span class="faint" style="font-size: var(--fs-1); margin-left: var(--s3);">Probe suite ≤ 200,000 gas — included in your trade.</span>
+  </div>
+</div>
+
+<!-- ============ STATE: REJECTED / NOT SENT ============ -->
+<div class="state">
+  <span class="label">state — rejected in wallet / gas failure</span>
+  <div class="panel">
+    <h1>Nothing was sent</h1>
+    <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);"><strong>Rejected in wallet</strong> — the signature was declined, so no transaction was broadcast. <strong>Gas too low</strong> — the transaction never lands. Either way, your 1,250 USDG never left your wallet.</p>
+    <button class="btn danger">Swap guarded</button>
+    <span class="faint" style="font-size: var(--fs-1); margin-left: var(--s3);">Retry when ready — the guard re-runs every check at execution.</span>
+  </div>
+</div>
+
+<!-- ============ STATE: CONFIRMING ============ -->
+<div class="state">
+  <span class="label">state — confirming (in flight)</span>
+  <div class="panel">
+    <h1>Confirming…</h1>
+    <div class="mono" style="background: var(--bg-inset); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--s3); margin:0 0 var(--s3); display:grid; gap: var(--s2); font-size: var(--fs-1);">
+      <div><span style="color: var(--accent);">●</span> tx 0x6e30…c5d1 broadcast — waiting for receipt</div>
+      <div class="faint">the guard re-runs every check inside this transaction — a red flag reverts it atomically</div>
+      <div class="faint">outcome lands here the moment the receipt does</div>
+    </div>
+    <p class="faint mono" style="font-size: var(--fs-0); margin:0;">Robinhood Chain · 4663 · block 8,412,987</p>
+  </div>
+</div>
+
+<!-- ============ STATE: REVERTED (IMPL MISMATCH) ============ -->
+<div class="state">
+  <span class="label">state — reverted, deterministic reason surfaced</span>
+  <div class="panel" style="border-color: var(--risk-border);">
+    <h1 style="color: var(--risk);">Swap refused at execution</h1>
+    <div class="banner risk mono" style="margin-bottom: var(--s3);">GUARD_IMPL_MISMATCH: implementation 0x51aa…90c7 ≠ registry record 0x77be…41af</div>
+    <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);">The token you selected mimics NVIDIA (NVDA) but its bytecode is not the canonical implementation. The guard reverted on-chain — <strong>your 1,250 USDG never left your wallet.</strong></p>
+    <p class="faint mono" style="font-size: var(--fs-0); margin:0;">tx 0x8d21…9f3a · block 8,412,988 · gas used 184,220 · <a href="#">view on explorer</a></p>
+  </div>
+</div>
+
+<!-- ============ STATE: REVERTED (REVOKED — THE UPGRADE BEAT) ============ -->
+<div class="state">
+  <span class="label">state — reverted, record revoked after beacon upgrade</span>
+  <div class="panel" style="border-color: var(--risk-border);">
+    <h1 style="color: var(--risk);">Swap refused — verification revoked</h1>
+    <div class="banner risk mono" style="margin-bottom: var(--s3);">GUARD_RECORD_REVOKED: verification revoked at block 8,412,905 (beacon implementation changed)</div>
+    <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);">This token <strong>was</strong> verified yesterday. Its beacon implementation changed minutes ago, the registry revoked the stale record automatically, and the guard refused the trade at execution time — the moment that matters. A static docs page cannot do this.</p>
+    <p class="faint mono" style="font-size: var(--fs-0); margin:0;">revocation tx 0xf4c0…71b8 · <a href="#">evidence: impl slot before / after</a></p>
+  </div>
+</div>
+
+<!-- ============ STATE: SETTLED ============ -->
+<div class="state">
+  <span class="label">state — settled</span>
+  <div class="panel" style="border-color: var(--verified-border);">
+    <h1 style="color: var(--verified);">Settled</h1>
+    <div class="banner verified mono" style="margin-bottom: var(--s3);">All guard checks passed at execution</div>
+    <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);">1,250 USDG → <strong>0.98 NVDA</strong> delivered to your wallet. Guard receipt: record live, not paused, buyer clear, implementation matched — all re-verified in the same transaction that settled.</p>
+    <p class="faint mono" style="font-size: var(--fs-0); margin:0;">tx 0x2b97…44de · gas 231,504 incl. probes · <a href="#">guard receipt</a></p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vetted — Scan</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  /* Layout only — all colors/fonts/spacing from theme.css */
+  .wrap { max-width: 980px; margin: 0 auto; padding: var(--s6) var(--s5); }
+  .state { margin-bottom: var(--s7); }
+  .state > .label { display: block; margin-bottom: var(--s3); }
+  .hero { text-align: center; margin: var(--s6) 0; }
+  .hero h1 { font-size: var(--fs-5); margin: 0 0 var(--s2); }
+  .scanline { display: flex; gap: var(--s3); }
+  .scanline .input { flex: 1; }
+  .grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--s4); }
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s3); }
+  header.bar { display:flex; align-items:center; justify-content:space-between; padding: var(--s4) 0; border-bottom: 1px solid var(--border); margin-bottom: var(--s6); }
+  header.bar nav { display:flex; gap: var(--s4); font-size: var(--fs-1); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="bar">
+  <div style="display:flex; align-items:center; gap: var(--s3);">
+    <span class="mono" style="font-size: var(--fs-3); font-weight:700;">vetted_</span>
+    <nav><a href="scan.html">Scan</a><a href="swap.html">Swap</a><a href="registry.html">Registry</a></nav>
+  </div>
+  <span class="chip mono">● Robinhood Chain · 4663 <span class="faint">▾</span></span>
+</header>
+
+<!-- ============ STATE: EMPTY ============ -->
+<div class="state">
+  <span class="label">state — empty</span>
+  <div class="hero">
+    <h1>Is this stock token real — and what can it do to you?</h1>
+    <p class="muted" style="margin-top:0;">Paste any token address on Robinhood Chain. Evidence-linked verdicts, no listing required, nothing guessed.</p>
+    <div class="scanline">
+      <input class="input" type="text" placeholder="0x… token address" spellcheck="false">
+      <button class="btn">Scan</button>
+    </div>
+    <p class="faint mono" style="font-size: var(--fs-0);">bytecode · EIP-1967 slot · execution probes · issuer canonical list, fetched live</p>
+    <p class="faint" style="font-size: var(--fs-1);">Try: <a href="#">canonical NVIDIA (NVDA)</a> · <a href="#">impostor twin — side-by-side compare</a></p>
+  </div>
+</div>
+
+<!-- ============ STATE: SCANNING ============ -->
+<div class="state">
+  <span class="label">state — scanning</span>
+  <div class="panel mono" style="display:grid; gap: var(--s2);">
+    <div><span style="color: var(--verified);">✓</span> bytecode fetched — 2.1 kB, proxy pattern</div>
+    <div><span style="color: var(--verified);">✓</span> EIP-1967 slot → implementation 0x77be…41af</div>
+    <div><span style="color: var(--verified);">✓</span> probes: paused() → false · isBlocked(buyer) → false</div>
+    <div class="faint">… fetching issuer canonical list — docs.robinhood.com/chain/contracts</div>
+  </div>
+</div>
+
+<!-- ============ STATE: VERIFIED ============ -->
+<div class="state">
+  <span class="label">state — verified (genuine token, risky powers)</span>
+  <div class="grid">
+    <div class="panel">
+      <div style="display:flex; align-items:center; gap: var(--s3); margin-bottom: var(--s3);">
+        <span class="badge verified" style="font-size: var(--fs-3); padding: var(--s1) var(--s3);">VERIFIED</span>
+        <div>
+          <div style="font-weight:700;">NVIDIA <span class="muted">· Robinhood Stock Token</span></div>
+          <div class="mono faint">0x9f8c24b7e3d1a05f6c8b4e2d9a7f1035c6b8d2e4</div>
+        </div>
+      </div>
+      <div class="label" style="margin-bottom: var(--s1);">what this contract can do to your balance</div>
+      <div class="report-row"><span>Admin blocklist in Solidity modifier — invisible in the ABI</span><span class="mono" style="color: var(--risk);">DETECTED</span><a href="#">bytecode diff</a></div>
+      <div class="report-row"><span>Global pause — one registry can halt every stock token</span><span class="mono" style="color: var(--risk);">ENABLED</span><a href="#">slot read</a></div>
+      <div class="report-row"><span>Beacon-proxy upgradeable — behavior can change without notice</span><span class="mono" style="color: var(--advisory);">YES</span><a href="#">slot 0xa3f0…</a></div>
+      <div class="report-row"><span>Buyer blocklist probe (your wallet)</span><span class="mono" style="color: var(--verified);">CLEAR</span><a href="#">staticcall</a></div>
+      <p class="faint" style="font-size: var(--fs-1); margin-bottom:0;">Verified ≠ safe. This is the genuine token, and it still carries the powers above. <a href="swap.html">Swap guarded →</a></p>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom: var(--s3);">
+        <div class="label" style="margin-bottom: var(--s2);">sequencer filterer — censorship watchdog</div>
+        <div style="display:flex; gap: var(--s4); align-items:baseline;">
+          <div><span class="mono" style="font-size: var(--fs-4);">6,092</span><div class="faint mono" style="font-size: var(--fs-0);">runs since launch — one RPC read</div></div>
+          <div><span class="mono">~150/day</span><div class="faint mono" style="font-size: var(--fs-0);">6-week baseline</div></div>
+        </div>
+        <p class="faint" style="font-size: var(--fs-1); margin-bottom:0;">Cumulative filterer executions — no published criteria, no appeals. <a href="#">Method</a></p>
+      </div>
+      <div class="panel">
+        <div class="label" style="margin-bottom: var(--s2);">ground truth</div>
+        <p class="muted" style="font-size: var(--fs-1); margin:0;">Issuer canonical list fetched live at scan time — <span class="mono">docs.robinhood.com/chain/contracts</span>. <a href="#">Fetch receipt</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STATE: IMPOSTOR ============ -->
+<div class="state">
+  <span class="label">state — impostor</span>
+  <div class="panel" style="border-color: var(--risk-border);">
+    <div style="display:flex; align-items:center; gap: var(--s3); margin-bottom: var(--s3);">
+      <span class="badge impostor" style="font-size: var(--fs-3); padding: var(--s1) var(--s3);">IMPOSTOR</span>
+      <div>
+        <div style="font-weight:700; color: var(--risk);">This is not a Robinhood Stock Token.</div>
+        <div class="mono faint">0x51aa7e03c9f2b6d84a1c5e9b0d7f3261a8c490c7</div>
+      </div>
+    </div>
+    <table class="table">
+      <thead><tr><th></th><th>Canonical</th><th style="color: var(--risk);">Suspect</th></tr></thead>
+      <tbody>
+        <tr><td class="label">Name</td><td>NVIDIA</td><td style="color: var(--risk);">NVIDIA • Robinhood Token</td></tr>
+        <tr><td class="label">Symbol</td><td class="mono">NVDA</td><td class="mono" style="color: var(--risk);">NVDA</td></tr>
+        <tr><td class="label">Impl hash</td><td class="mono">0x77be…41af</td><td class="mono" style="color: var(--risk);">0xc30d…e812</td></tr>
+        <tr><td class="label">In issuer list</td><td style="color: var(--verified);">yes</td><td style="color: var(--risk);">no</td></tr>
+      </tbody>
+    </table>
+    <p class="faint" style="font-size: var(--fs-1); margin-bottom:0;">Positive evidence: name/symbol mimic a canonical at a different address, and implementation bytecode differs. <a href="#">Full diff</a> · <a href="swap.html">Watch the guard refuse it on-chain →</a></p>
+  </div>
+</div>
+
+<!-- ============ STATE: UNVERIFIED ============ -->
+<div class="state">
+  <span class="label">state — unverified (off-pattern contract)</span>
+  <div class="panel">
+    <div style="display:flex; align-items:center; gap: var(--s3); margin-bottom: var(--s3);">
+      <span class="badge unverified" style="font-size: var(--fs-3); padding: var(--s1) var(--s3);">UNVERIFIED</span>
+      <div class="mono faint">0x3e91b8…f27d</div>
+    </div>
+    <div class="report-row"><span>Owner can exclude addresses from fees</span><span class="mono" style="color: var(--advisory);">ADVISORY</span><a href="#">signature</a></div>
+    <div class="report-row"><span>Proxy pattern detected, non-beacon</span><span class="mono" style="color: var(--advisory);">ADVISORY</span><a href="#">slot read</a></div>
+    <div class="banner advisory" style="margin-top: var(--s3);">Depth boundary: full verdicts cover the Robinhood stock-token pattern (signature match). This contract is off-pattern, so every line above is a structural heuristic — advisory only, never a verdict.</div>
+  </div>
+</div>
+
+<!-- ============ STATE: REVOKED ============ -->
+<div class="state">
+  <span class="label">state — revoked (verified before, beacon upgraded since)</span>
+  <div class="panel" style="border-color: var(--risk-border);">
+    <div style="display:flex; align-items:center; gap: var(--s3); margin-bottom: var(--s3);">
+      <span class="badge impostor" style="font-size: var(--fs-3); padding: var(--s1) var(--s3);">REVOKED</span>
+      <div>
+        <div style="font-weight:700; color: var(--risk);">Verification revoked — this token changed since it was verified.</div>
+        <div class="mono faint">0x9f8c24b7e3d1a05f6c8b4e2d9a7f1035c6b8d2e4</div>
+      </div>
+    </div>
+    <div class="banner risk mono" style="margin-bottom: var(--s3);">beacon implementation changed 2026-09-06 · record revoked · revocation tx <a href="#">0xf4c0…71b8</a></div>
+    <p class="faint" style="font-size: var(--fs-1); margin-bottom:0;">The registry record is stale by definition — the guard refuses swaps against it. <a href="swap.html">See the refusal →</a></p>
+  </div>
+</div>
+
+<!-- ============ STATE: ERRORS ============ -->
+<div class="state">
+  <span class="label">state — errors</span>
+  <div class="cards">
+    <div class="panel">
+      <div class="label" style="margin-bottom: var(--s2);">not a contract</div>
+      <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);">0x8a12… has no code — a wallet address, not a token. Nothing to scan.</p>
+      <a href="#" style="font-size: var(--fs-1);">Scan a different address</a>
+    </div>
+    <div class="panel">
+      <div class="label" style="margin-bottom: var(--s2);">rpc unreachable</div>
+      <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);">Chain 4663 RPC timed out mid-probe. No partial verdicts are shown.</p>
+      <a href="#" style="font-size: var(--fs-1);">Retry scan</a>
+    </div>
+    <div class="panel">
+      <div class="label" style="margin-bottom: var(--s2);">ground truth down</div>
+      <div class="banner advisory" style="margin-bottom: var(--s2);">Issuer canonical list unreachable. All verdicts drop to UNVERIFIED until it responds.</div>
+      <a href="#" style="font-size: var(--fs-1);">Retry fetch</a>
+    </div>
+    <div class="panel">
+      <div class="label" style="margin-bottom: var(--s2);">wrong network</div>
+      <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);">Selector is on Arbitrum Sepolia (mirror). Robinhood Stock Tokens live on Robinhood Chain · 4663 — switch the selector back. Scanning stays read-only; no wallet involved.</p>
+      <a href="#" style="font-size: var(--fs-1);">Switch to 4663</a>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

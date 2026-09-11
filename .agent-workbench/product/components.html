@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vetted — components</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  /* Layout scaffolding only — every color/font/spacing value comes from theme.css tokens. */
+  .wrap { max-width: 980px; margin: 0 auto; padding: var(--s6) var(--s5); }
+  section { margin-bottom: var(--s7); }
+  h2 { font-size: var(--fs-4); margin: 0 0 var(--s4); }
+  .sample { margin-bottom: var(--s4); }
+  .row { display: flex; gap: var(--s3); align-items: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section>
+  <div class="label">header / nav</div>
+  <div class="sample">
+    <header style="display:flex; align-items:center; justify-content:space-between; padding: var(--s4) 0; border-bottom: 1px solid var(--border);">
+      <div style="display:flex; align-items:center; gap: var(--s3);">
+        <span style="font-family: var(--font-mono); font-size: var(--fs-3); font-weight: 700;">vetted_</span>
+        <nav style="display:flex; gap: var(--s4); font-size: var(--fs-1);">
+          <a href="#">Scan</a><a href="#">Swap</a><a href="#">Registry</a>
+        </nav>
+      </div>
+      <span class="chip mono">● Robinhood Chain · 4663</span>
+    </header>
+  </div>
+</section>
+
+<section>
+  <div class="label">network chip</div>
+  <div class="sample row">
+    <span class="chip mono">● Robinhood Chain · 4663</span>
+    <span class="chip mono" style="color: var(--advisory);">● Arbitrum Sepolia mirror</span>
+  </div>
+</section>
+
+<section>
+  <div class="label">buttons</div>
+  <div class="sample row">
+    <button class="btn">Scan address</button>
+    <button class="btn ghost">Connect wallet</button>
+    <button class="btn danger">Swap guarded</button>
+  </div>
+</section>
+
+<section>
+  <div class="label">input + action</div>
+  <div class="sample row">
+    <input class="input mono" style="flex:1; min-width:32ch;" type="text" value="0x9f8c24b7e3d1a05f6c8b4e2d9a7f1035c6b8d2e4" spellcheck="false">
+    <button class="btn">Scan</button>
+  </div>
+</section>
+
+<section>
+  <div class="label">verdict badges</div>
+  <div class="sample row">
+    <span class="badge verified">VERIFIED</span>
+    <span class="badge impostor">IMPOSTOR</span>
+    <span class="badge unverified">UNVERIFIED</span>
+    <span class="badge impostor">REVOKED</span>
+    <span class="badge impostor">PAUSED</span>
+  </div>
+</section>
+
+<section>
+  <div class="label">panel</div>
+  <div class="sample">
+    <div class="panel">
+      <div class="label" style="margin-bottom: var(--s2);">power report</div>
+      <div class="report-row"><span>Admin blocklist in modifier (absent from ABI)</span><span class="mono" style="color: var(--risk);">DETECTED</span><a href="#">evidence</a></div>
+      <div class="report-row"><span>Global pause control</span><span class="mono" style="color: var(--risk);">ENABLED</span><a href="#">evidence</a></div>
+      <div class="report-row"><span>Beacon-proxy upgradeable</span><span class="mono" style="color: var(--advisory);">YES</span><a href="#">evidence</a></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="label">probe checklist (guard pre-flight)</div>
+  <div class="sample">
+    <div class="panel">
+      <div class="check-row"><span class="mono" style="color: var(--verified);">✓</span><span>Live verification record in Canonical Registry</span><span class="mono">verified 2026-08-30</span></div>
+      <div class="check-row"><span class="mono" style="color: var(--verified);">✓</span><span>Token not paused</span><span class="mono">paused() → false</span></div>
+      <div class="check-row"><span class="mono" style="color: var(--verified);">✓</span><span>Buyer not blocklisted</span><span class="mono">isBlocked(buyer) → false</span></div>
+      <div class="check-row"><span class="mono" style="color: var(--risk);">✗</span><span>Implementation matches registry record</span><span class="mono" style="color: var(--risk);">0x51aa… ≠ 0x77be…</span></div>
+      <div class="check-row"><span class="mono faint">…</span><span class="faint">Fetching issuer canonical list</span><span class="mono faint">docs.robinhood.com</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="label">side-by-side diff (impostor)</div>
+  <div class="sample">
+    <table class="table">
+      <thead><tr><th></th><th>Canonical</th><th style="color: var(--risk);">Suspect</th></tr></thead>
+      <tbody>
+        <tr><td class="label">Name</td><td>NVIDIA</td><td style="color: var(--risk);">NVIDIA • Robinhood Token</td></tr>
+        <tr><td class="label">Symbol</td><td class="mono">NVDA</td><td class="mono" style="color: var(--risk);">NVDA</td></tr>
+        <tr><td class="label">Address</td><td class="mono">0x9f8c…d2e4</td><td class="mono" style="color: var(--risk);">0x51aa…90c7</td></tr>
+        <tr><td class="label">Impl hash</td><td class="mono">0x77be…41af</td><td class="mono" style="color: var(--risk);">0xc30d…e812</td></tr>
+        <tr><td class="label">In issuer list</td><td style="color: var(--verified);">yes</td><td style="color: var(--risk);">no</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="label">stat widget (watchdog)</div>
+  <div class="sample">
+    <div class="panel">
+      <div class="label" style="margin-bottom: var(--s2);">sequencer filterer — censorship watchdog</div>
+      <div style="display:flex; gap: var(--s6); align-items: baseline;">
+        <div><span class="mono" style="font-size: var(--fs-4);">6,092</span><div class="faint" style="font-size: var(--fs-0);">runs since launch — one RPC read</div></div>
+        <div><span class="mono" style="font-size: var(--fs-4);">~150<span class="faint">/day</span></span><div class="faint" style="font-size: var(--fs-0);">6-week baseline (measured 2026-08)</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="label">banners</div>
+  <div class="sample">
+    <div class="banner advisory">Issuer canonical list unreachable — ground truth is down, every verdict drops to UNVERIFIED until it responds. Nothing is guessed.</div>
+  </div>
+  <div class="sample">
+    <div class="banner risk">GUARD_RECORD_REVOKED — verification revoked at block 8,412,905 (beacon implementation changed). Swap refused at execution. Funds never moved.</div>
+  </div>
+</section>
+
+<section>
+  <div class="label">data table (registry)</div>
+  <div class="sample">
+    <table class="table">
+      <thead><tr><th>Token</th><th>Symbol</th><th>Status</th><th>Implementation</th><th>Verified</th><th>Registrar</th></tr></thead>
+      <tbody>
+        <tr><td>NVIDIA</td><td class="mono">NVDA</td><td><span class="badge verified">VERIFIED</span></td><td class="mono">0x77be…41af</td><td class="mono">2026-08-30</td><td class="mono">0x5e15…aa11</td></tr>
+        <tr><td>OpenAI</td><td class="mono">OPENAI</td><td><span class="badge impostor">REVOKED</span></td><td class="mono">0x1d4f…88b3</td><td class="mono">2026-08-12</td><td class="mono">0x5e15…aa11</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+</body>
+</html>

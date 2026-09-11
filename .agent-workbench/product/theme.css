@@ -1,0 +1,175 @@
+/* theme.css — Vetted (placeholder name), "security terminal" theme.
+   Decisions behind the tokens (Q8, decided round 2):
+   - Dark only. A 5-minute judged demo lives on screen impression; dark terminal reads "security tool".
+   - The brand IS a duality: verified-green vs risk-red. Green is used ONLY for verified/success,
+     red ONLY for risk/failure — verdict color is never decoration.
+   - Cyan is the interactive accent (actions, links, focus) and never a verdict color.
+   - Amber is advisory only: UNVERIFIED verdicts and heuristic warnings that must NOT revert anything.
+   - Mono for every on-chain value (addresses, hashes, slots, gas); sans for prose.
+   - Compact density: terminal spacing, single small radius, no pill soup. */
+
+:root {
+  /* Surfaces — near-black, cold blue, three depths */
+  --bg: #0A0E13;
+  --bg-raised: #10161E;
+  --bg-inset: #070B0F;
+  --border: #1E2833;
+  --border-strong: #2C3A48;
+
+  /* Text */
+  --text: #E7EEF5;
+  --text-muted: #8C9BA9;
+  --text-faint: #5C6B7A;
+
+  /* Verdict duality */
+  --verified: #2BD576;
+  --verified-bg: rgba(43, 213, 118, 0.10);
+  --verified-border: rgba(43, 213, 118, 0.35);
+
+  --risk: #FF4D5E;
+  --risk-bg: rgba(255, 77, 94, 0.10);
+  --risk-border: rgba(255, 77, 94, 0.38);
+
+  --advisory: #FFB454;
+  --advisory-bg: rgba(255, 180, 84, 0.08);
+  --advisory-border: rgba(255, 180, 84, 0.30);
+
+  /* Interactive accent */
+  --accent: #4CC2FF;
+  --accent-bg: rgba(76, 194, 255, 0.10);
+
+  /* Type */
+  --font-sans: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  --fs-0: 12px;   /* labels, table meta */
+  --fs-1: 13px;   /* body small, report rows */
+  --fs-2: 14px;   /* body */
+  --fs-3: 16px;   /* emphasis */
+  --fs-4: 20px;   /* section head */
+  --fs-5: 28px;   /* verdict word, page title */
+
+  /* Spacing — compact */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+
+  --radius: 6px;
+  --radius-lg: 10px;
+  --focus: 0 0 0 2px rgba(76, 194, 255, 0.5);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-2);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: none; box-shadow: var(--focus); }
+
+.mono { font-family: var(--font-mono); font-size: var(--fs-1); }
+.muted { color: var(--text-muted); }
+.faint { color: var(--text-faint); }
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-0);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+/* ---- Component classes (markup lives in components.html; styles here so retheming stays one file) ---- */
+
+.chip {
+  display: inline-flex; align-items: center; gap: var(--s2);
+  font-size: var(--fs-0);
+  color: var(--verified);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--s1) var(--s3);
+}
+
+.btn {
+  font-family: var(--font-sans); font-size: var(--fs-2); font-weight: 600;
+  color: var(--bg);
+  background: var(--accent);
+  border: none; border-radius: var(--radius);
+  padding: var(--s2) var(--s4);
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn.ghost {
+  color: var(--accent); background: transparent;
+  border: 1px solid var(--border-strong);
+}
+.btn.danger {
+  color: var(--risk); background: transparent;
+  border: 1px solid var(--risk-border);
+}
+
+.input {
+  font-family: var(--font-mono); font-size: var(--fs-1);
+  color: var(--text);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: var(--s2) var(--s3);
+}
+.input:focus { outline: none; box-shadow: var(--focus); }
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono); font-size: var(--fs-0); font-weight: 700;
+  letter-spacing: 0.08em;
+  border-radius: var(--radius);
+  padding: 2px var(--s2);
+}
+.badge.verified  { color: var(--verified); background: var(--verified-bg); border: 1px solid var(--verified-border); }
+.badge.impostor  { color: var(--risk); background: var(--risk-bg); border: 1px solid var(--risk-border); }
+.badge.unverified{ color: var(--advisory); background: var(--advisory-bg); border: 1px solid var(--advisory-border); }
+
+.panel {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--s4);
+}
+
+.report-row {
+  display: grid; grid-template-columns: 1fr auto auto; gap: var(--s4); align-items: center;
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-1);
+}
+.report-row:last-child { border-bottom: none; }
+
+.check-row {
+  display: grid; grid-template-columns: auto 1fr auto; gap: var(--s3); align-items: center;
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-1);
+}
+.check-row:last-child { border-bottom: none; }
+
+.table { width: 100%; border-collapse: collapse; font-size: var(--fs-1); }
+.table th {
+  text-align: left; font-family: var(--font-mono); font-size: var(--fs-0);
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint);
+  padding: var(--s2) var(--s3); border-bottom: 1px solid var(--border-strong);
+}
+.table td { padding: var(--s2) var(--s3); border-bottom: 1px solid var(--border); }
+
+.banner {
+  border-radius: var(--radius);
+  padding: var(--s3) var(--s4);
+  font-size: var(--fs-1);
+}
+.banner.advisory { color: var(--advisory); background: var(--advisory-bg); border: 1px solid var(--advisory-border); }
+.banner.risk { color: var(--risk); background: var(--risk-bg); border: 1px solid var(--risk-border); }
+.banner.verified { color: var(--verified); background: var(--verified-bg); border: 1px solid var(--verified-border); }

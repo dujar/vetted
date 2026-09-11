@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vetted — Canonical Registry</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  /* Layout only — all colors/fonts/spacing from theme.css */
+  .wrap { max-width: 980px; margin: 0 auto; padding: var(--s6) var(--s5); }
+  .state { margin-bottom: var(--s7); }
+  .state > .label { display: block; margin-bottom: var(--s3); }
+  .grid { display: grid; grid-template-columns: 1.7fr 1fr; gap: var(--s4); align-items: start; }
+  .skel { height: var(--fs-0); background: var(--border); border-radius: var(--radius); }
+  h1 { font-size: var(--fs-4); margin: 0 0 var(--s2); }
+  header.bar { display:flex; align-items:center; justify-content:space-between; padding: var(--s4) 0; border-bottom: 1px solid var(--border); margin-bottom: var(--s6); }
+  header.bar nav { display:flex; gap: var(--s4); font-size: var(--fs-1); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="bar">
+  <div style="display:flex; align-items:center; gap: var(--s3);">
+    <span class="mono" style="font-size: var(--fs-3); font-weight:700;">vetted_</span>
+    <nav><a href="scan.html">Scan</a><a href="swap.html">Swap</a><a href="registry.html">Registry</a></nav>
+  </div>
+  <span class="chip mono">● Robinhood Chain · 4663</span>
+</header>
+
+<!-- ============ MAIN STATE ============ -->
+<div class="state">
+  <span class="label">state — populated</span>
+  <h1>Canonical Registry</h1>
+  <p class="muted" style="font-size: var(--fs-1); margin-top:0;">The machine-readable, revocable, upgrade-aware replacement for the issuer's docs page. Ground truth is Robinhood's own canonical list, fetched live — this registry never contradicts the issuer on a genuine token.</p>
+
+  <div class="grid">
+    <div class="panel">
+      <table class="table">
+        <thead><tr><th>Token</th><th>Symbol</th><th>Status</th><th>Implementation</th><th>Verified</th><th>Registrar</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>NVIDIA</td><td class="mono">NVDA</td><td><span class="badge verified">VERIFIED</span></td><td class="mono">0x77be…41af</td><td class="mono">2026-08-30</td><td class="mono">0x5e15…aa11</td><td><a href="scan.html">scan</a></td></tr>
+          <tr><td>AMC Entertainment</td><td class="mono">AMC</td><td><span class="badge verified">VERIFIED</span></td><td class="mono">0x44e0…b9c2</td><td class="mono">2026-08-30</td><td class="mono">0x5e15…aa11</td><td><a href="scan.html">scan</a></td></tr>
+          <tr><td>OpenAI</td><td class="mono">OPENAI</td><td><span class="badge impostor">REVOKED</span><div class="faint mono" style="font-size: var(--fs-0);">beacon impl changed 2026-09-06 — record stale · <a href="#">evidence</a></div></td><td class="mono">0x1d4f…88b3</td><td class="mono">2026-08-12</td><td class="mono">0x5e15…aa11</td><td><a href="scan.html">scan</a></td></tr>
+          <tr><td>SpaceX</td><td class="mono">SPACEX</td><td><span class="badge verified">VERIFIED</span></td><td class="mono">0x9c71…02fa</td><td class="mono">2026-09-02</td><td class="mono">0x5e15…aa11</td><td><a href="scan.html">scan</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <div class="panel" style="margin-bottom: var(--s3);">
+        <div class="label" style="margin-bottom: var(--s2);">who writes</div>
+        <p class="muted" style="font-size: var(--fs-1); margin:0 0 var(--s2);">A single registrar key held by this project's backend — <span class="mono">registrar: 0x5e15…aa11</span>. <a href="#">Verification criteria, published in the repo.</a></p>
+        <p class="faint" style="font-size: var(--fs-1); margin:0;">Records are <strong>revocable</strong>: a beacon upgrade stales a verification, and revocation is the feature — the guard refuses a stale record at execution time.</p>
+      </div>
+      <div class="panel">
+        <div class="label" style="margin-bottom: var(--s2);">consume it from your contract</div>
+        <div class="mono" style="background: var(--bg-inset); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--s3); font-size: var(--fs-1); overflow-x:auto;">ICanonicalRegistry(token)
+  → (status, impl, verifiedAt,
+     registrar)</div>
+        <p class="faint" style="font-size: var(--fs-1);">Wallets, aggregators and frontends can gate on this record on-chain — the registry is a primitive, not just a page.</p>
+        <div style="border-top: 1px solid var(--border); margin-top: var(--s3); padding-top: var(--s2);"><span class="label">roadmap</span> <span class="faint mono" style="font-size: var(--fs-0); margin-left: var(--s2);">watchlists · alerts · partner integrations</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOADING STATE ============ -->
+<div class="state">
+  <span class="label">state — loading</span>
+  <div class="panel">
+    <h1>Canonical Registry</h1>
+    <table class="table" aria-hidden="true">
+      <thead><tr><th>Token</th><th>Symbol</th><th>Status</th><th>Implementation</th><th>Verified</th><th>Registrar</th></tr></thead>
+      <tbody>
+        <tr><td><div class="skel" style="width: 9ch;"></div></td><td><div class="skel" style="width: 6ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td><td><div class="skel" style="width: 11ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td></tr>
+        <tr><td><div class="skel" style="width: 11ch;"></div></td><td><div class="skel" style="width: 8ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td><td><div class="skel" style="width: 11ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td></tr>
+        <tr><td><div class="skel" style="width: 8ch;"></div></td><td><div class="skel" style="width: 7ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td><td><div class="skel" style="width: 11ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td><td><div class="skel" style="width: 10ch;"></div></td></tr>
+      </tbody>
+    </table>
+    <p class="faint" style="font-size: var(--fs-1); margin-bottom:0;">Reading verification records from the Canonical Registry…</p>
+  </div>
+</div>
+
+<!-- ============ DEGRADED STATE ============ -->
+<div class="state">
+  <span class="label">state — ground truth unreachable</span>
+  <div class="panel">
+    <h1>Canonical Registry</h1>
+    <div class="banner advisory" style="margin-bottom: var(--s3);">Issuer canonical list unreachable — new verifications are paused. Existing records stay readable on-chain; nothing is modified without ground truth.</div>
+    <table class="table">
+      <thead><tr><th>Token</th><th>Symbol</th><th>Status</th><th>Verified</th></tr></thead>
+      <tbody>
+        <tr><td>NVIDIA</td><td class="mono">NVDA</td><td><span class="badge verified">VERIFIED</span></td><td class="mono">2026-08-30</td></tr>
+        <tr><td>OpenAI</td><td class="mono">OPENAI</td><td><span class="badge impostor">REVOKED</span></td><td class="mono">2026-08-12</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ EMPTY STATE ============ -->
+<div class="state">
+  <span class="label">state — empty</span>
+  <div class="panel" style="text-align:center; padding: var(--s7);">
+    <p class="muted" style="margin:0 0 var(--s3);">No verification records yet on this chain.</p>
+    <p class="faint" style="font-size: var(--fs-1); margin:0;">Records appear once the registrar verifies the first canonical token. <a href="scan.html">Scan an address in the meantime →</a></p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
