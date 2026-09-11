@@ -29,3 +29,11 @@ The CI-green monorepo every later builder lands inside: toolchain pins (`rust-to
 ## Out of scope, left broken
 
 - Nothing broken. Deliberate shortcuts: frontend `verdicts.ts` duplicates the shared VERDICTS union (step 5 switches to `vetted-shared` imports when wiring the API client — noted in-file); `pages.json` records the production alias, the per-deployment URL probes intermittently failed TLS from this machine only.
+
+## Review round 1 (APPROVED) — non-blocking notes, disposition
+
+1. `e2e/`+`demo/` missing from the pushed tree (empty dirs) — FIXED: `.gitkeep` added to both; reserved layout now survives a clean checkout.
+2. plan.md:45 still carries the stale `blocked-auth` fallback parenthetical — ACCEPTED AS IS: the plan is a historical record; the truth (deploys live, token had scopes) is recorded here and in `deployments/*.json`. plan-agent's reconcile round owns plan text.
+3. `verdicts.ts` duplicates the shared union — ACCEPTED AS IS: deliberate, marked with the step-5 switch point; drift window ends when step 5 wires `vetted-shared` imports.
+4. 4 rustc `unexpected cfg condition value: contract-client-gen` warnings in `contracts/core/hello` — ACCEPTED AS IS: emitted by stylus-sdk macro expansion, not scaffold code; cosmetic.
+
