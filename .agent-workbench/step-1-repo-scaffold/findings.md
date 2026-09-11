@@ -1,7 +1,7 @@
 # Step 1 — repo scaffold
 
-status:     ready-to-merge
-branch:     step-1-repo-scaffold (PR #1, CI green on first push: all 4 jobs)
+status:     merged
+branch:     step-1-repo-scaffold (PR #1, merged into main as 5e2ff35; merge suite green)
 deployed:   worker https://vetted-scan-backend.dujar-coding.workers.dev (GET /health → {"ok":true}) · pages https://vetted-1un.pages.dev (HTTP 200) · GitHub https://github.com/dujar/vetted (public)
 
 ## What was built
