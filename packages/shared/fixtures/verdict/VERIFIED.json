@@ -1,0 +1,38 @@
+{
+  "chainId": 4663,
+  "addr": "0x9f8c24b7e3d1a05f6c8b4e2d9a7f1035c6b8d2e4",
+  "verdict": "VERIFIED",
+  "terminalState": null,
+  "degraded": false,
+  "notice": null,
+  "powerReport": [
+    {
+      "check": "Buyer blocklist in modifier",
+      "result": "ABSENT",
+      "severity": "verified",
+      "evidenceUrl": "https://robinhoodchain.blockscout.com/address/0x9f8c24b7e3d1a05f6c8b4e2d9a7f1035c6b8d2e4?tab=code"
+    },
+    {
+      "check": "Global pause control",
+      "result": "ABSENT",
+      "severity": "verified",
+      "evidenceUrl": "https://robinhoodchain.blockscout.com/address/0x9f8c24b7e3d1a05f6c8b4e2d9a7f1035c6b8d2e4?tab=code"
+    },
+    {
+      "check": "Upgradeability",
+      "result": "BEACON_PROXY",
+      "severity": "advisory",
+      "evidenceUrl": "https://robinhoodchain.blockscout.com/address/0x9f8c24b7e3d1a05f6c8b4e2d9a7f1035c6b8d2e4/read"
+    }
+  ],
+  "record": {
+    "status": "VERIFIED",
+    "riskFlags": "0",
+    "verifiedAt": 1788048000,
+    "impl": "0x77be0000000000000000000000000000000041af",
+    "registrar": "0x5e1500000000000000000000000000000000aa11",
+    "revokedAt": 0,
+    "reason": "0x0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "revocationTx": null
+}

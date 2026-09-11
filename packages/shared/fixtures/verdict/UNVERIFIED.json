@@ -1,0 +1,18 @@
+{
+  "chainId": 4663,
+  "addr": "0x1d4f0000000000000000000000000000000088b3",
+  "verdict": "UNVERIFIED",
+  "terminalState": null,
+  "degraded": true,
+  "notice": null,
+  "powerReport": [
+    {
+      "check": "Structural heuristics (advisory — no signature match)",
+      "result": "BEACON_LAYOUT",
+      "severity": "advisory",
+      "evidenceUrl": "https://robinhoodchain.blockscout.com/address/0x1d4f0000000000000000000000000000000088b3?tab=code"
+    }
+  ],
+  "record": null,
+  "revocationTx": null
+}

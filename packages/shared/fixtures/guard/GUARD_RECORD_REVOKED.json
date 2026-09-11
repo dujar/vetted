@@ -1,0 +1,4 @@
+{
+  "reason": "GUARD_RECORD_REVOKED",
+  "description": "Verification record exists but status is REVOKED — swap refused at execution; funds never moved."
+}

@@ -1,0 +1,4 @@
+{
+  "reason": "GUARD_PAUSED",
+  "description": "Staticcall paused() returned true on the token — swap refused at execution; funds never moved."
+}

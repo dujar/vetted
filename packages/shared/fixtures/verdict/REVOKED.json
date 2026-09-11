@@ -1,0 +1,26 @@
+{
+  "chainId": 4663,
+  "addr": "0x51aa0000000000000000000000000000000090c7",
+  "verdict": "REVOKED",
+  "terminalState": null,
+  "degraded": false,
+  "notice": null,
+  "powerReport": [
+    {
+      "check": "Beacon implementation changed since verification",
+      "result": "IMPL_DRIFT",
+      "severity": "risk",
+      "evidenceUrl": "https://robinhoodchain.blockscout.com/address/0x51aa0000000000000000000000000000000090c7/read"
+    }
+  ],
+  "record": {
+    "status": "REVOKED",
+    "riskFlags": "0",
+    "verifiedAt": 1787356800,
+    "impl": "0x77be0000000000000000000000000000000041af",
+    "registrar": "0x5e1500000000000000000000000000000000aa11",
+    "revokedAt": 1788652800,
+    "reason": "0x626561636f6e20696d706c206368616e67656400000000000000000000000000"
+  },
+  "revocationTx": "0xab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12"
+}
