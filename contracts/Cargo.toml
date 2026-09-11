@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+# Contract crates live under core/ (replicas/ is step 6's own foundry project,
+# not a member). Drop a new crate in and the glob picks it up.
+members = ["core/*"]
+
+[profile.release]
+# Standard Stylus release profile (size matters on-chain: 96 KB runtime cap).
+codegen-units = 1
+strip = true
+lto = true
+panic = "abort"
+opt-level = 3

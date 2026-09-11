@@ -1,0 +1,3 @@
+# Marks this crate as a Stylus contract for cargo-stylus (cargo-workspace
+# support since sdk 0.10.0 — knowledge stylus-toolchain.md). Size/opt knobs
+# ([wasm-opt] table pinning Binaryen) go here when reproducible builds need them.

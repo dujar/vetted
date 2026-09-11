@@ -1,0 +1,19 @@
+[package]
+name = "hello"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+stylus-sdk = "0.10.9"
+
+[dev-dependencies]
+# Enables stylus_sdk::testing (native TestVM) for unit tests only; the feature
+# does not reach the wasm build (resolver 2 keeps dev-dep features separate).
+stylus-sdk = { version = "0.10.9", features = ["stylus-test"] }
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
