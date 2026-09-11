@@ -1,0 +1,7 @@
+# One toolchain for both halves of the project: Stylus contracts and the
+# workers-rs backend compile to the same wasm32-unknown-unknown target
+# (knowledge workers-rust.md). Current stable — quickstart requires >= 1.91,
+# do not pin old (knowledge stylus-toolchain.md).
+[toolchain]
+channel = "stable"
+targets = ["wasm32-unknown-unknown"]
