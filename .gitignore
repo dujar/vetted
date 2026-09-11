@@ -1,0 +1,21 @@
+# Rust
+target/
+
+# Node
+node_modules/
+dist/
+
+# Env / secrets — never commit. An .env.example may be tracked.
+.env*
+.dev.vars*
+!.env.example
+!.dev.vars.example
+
+# Wrangler local state / caches
+.wrangler/
+cache/
+out/
+
+# Editors / OS
+.DS_Store
+*.log

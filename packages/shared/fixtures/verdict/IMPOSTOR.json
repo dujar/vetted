@@ -1,0 +1,24 @@
+{
+  "chainId": 4663,
+  "addr": "0x51aa0000000000000000000000000000000090c7",
+  "verdict": "IMPOSTOR",
+  "terminalState": null,
+  "degraded": false,
+  "notice": null,
+  "powerReport": [
+    {
+      "check": "Metadata mimics canonical NVIDIA (NVDA)",
+      "result": "MIMICRY",
+      "severity": "risk",
+      "evidenceUrl": "https://api.robinhood.com/rhj/assets"
+    },
+    {
+      "check": "Implementation differs from canonical impl",
+      "result": "0xc30d…e812 ≠ 0x77be…41af",
+      "severity": "risk",
+      "evidenceUrl": "https://robinhoodchain.blockscout.com/address/0x51aa0000000000000000000000000000000090c7/read"
+    }
+  ],
+  "record": null,
+  "revocationTx": null
+}

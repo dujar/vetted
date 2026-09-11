@@ -1,0 +1,4 @@
+{
+  "reason": "GUARD_NO_RECORD",
+  "description": "No verification record in the Canonical Registry for this token — swap refused at execution; funds never moved."
+}

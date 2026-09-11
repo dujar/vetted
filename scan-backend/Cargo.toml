@@ -1,0 +1,15 @@
+[package]
+name = "scan-backend"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+worker = "0.8.5"
+
+# No dev-dependencies: unit tests target the pure route fn (verify.md loose
+# end 5) — wasm-bindgen-bound types panic on non-wasm targets, so the
+# #[event(fetch)] handler stays a thin wrapper and tests stay host-native.

@@ -1,0 +1,8 @@
+name = "vetted-scan-backend"
+main = "build/index.js"
+compatibility_date = "2026-08-01"
+
+[build]
+command = "cargo install -q 'worker-build@^0.8' && worker-build --release"
+
+# Step 4 adds the cron trigger (registrar drift-revoke) and secrets here.

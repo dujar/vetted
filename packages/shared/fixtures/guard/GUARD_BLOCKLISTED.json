@@ -1,0 +1,4 @@
+{
+  "reason": "GUARD_BLOCKLISTED",
+  "description": "Per-address blocklist probe returned true for the buyer — swap refused at execution; funds never moved."
+}

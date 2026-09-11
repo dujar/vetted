@@ -1,0 +1,9 @@
+{
+  "name": "vetted-scan-backend",
+  "url": "https://vetted-scan-backend.dujar-coding.workers.dev",
+  "status": "deployed",
+  "deployedAt": "2026-09-12",
+  "commit": "030301c",
+  "check": "GET /health -> {\"ok\":true} (live-probed 2026-09-12)",
+  "note": "step-1 hello scaffold; step 4 ships the real verdict engine on this worker"
+}

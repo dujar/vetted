@@ -1,0 +1,4 @@
+{
+  "reason": "GUARD_IMPL_MISMATCH",
+  "description": "Resolved implementation (EIP-1967 slot, else beacon) differs from the record's impl — swap refused at execution; funds never moved."
+}

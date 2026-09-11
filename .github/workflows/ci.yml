@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build for wasm32 (deploy-artifact shape)
+        run: cargo build --workspace --target wasm32-unknown-unknown
+        working-directory: contracts
+      - name: Native tests (stylus test host)
+        run: cargo test --workspace
+        working-directory: contracts
+
+  scan-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo test
+        working-directory: scan-backend
+
+  shared:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: packages/shared/package-lock.json
+      - name: TS round-trip (fixtures vs types.ts)
+        run: npm ci && npm test
+        working-directory: packages/shared
+      - name: Rust round-trip (fixtures vs types.rs)
+        run: cargo test
+        working-directory: packages/shared
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - name: tsc + vite build
+        run: npm run build
+        working-directory: frontend
+      - name: vitest
+        run: npm test
+        working-directory: frontend
