@@ -1,0 +1,9 @@
+{
+  "name": "vetted",
+  "url": "https://vetted-1un.pages.dev",
+  "status": "deployed",
+  "deployedAt": "2026-09-12",
+  "commit": "030301c",
+  "check": "HTTP 200 (live-probed 2026-09-12)",
+  "note": "step-1 static shell (frontend/dist); step 5 ships the real screens"
+}
