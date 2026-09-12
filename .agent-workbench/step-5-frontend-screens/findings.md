@@ -1,7 +1,7 @@
 # Step 5 — frontend screens (scan / swap / registry)
 
-status:     ready-to-merge (review pending — see below)
-branch:     step-5-frontend-screens (pushed, draft PR #2; CI run 34665443813 SUCCESS — all four jobs green incl. frontend tsc+build+76 tests)
+status:     merged
+branch:     step-5-frontend-screens (merged into main as e37bc15 via --no-ff; merge suite green on main: frontend build + 84 tests, shared 15; CI run 34667626718 SUCCESS on the branch)
 deployed:   not deployed (pages redeploy is step 8/10's job)
 
 ## What was built
