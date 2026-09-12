@@ -1,11 +1,14 @@
 /**
- * Verdict vocabulary + theme mapping. Local mirror of packages/shared
- * (`VERDICTS`); the shared package is the source of truth — step 5 switches
- * the import to vetted-shared when it wires the API client. Kept local so the
- * step-1 scaffold has no cross-package wiring.
+ * Verdict vocabulary + theme mapping. The union now comes from
+ * `vetted-shared` (step-1 findings: the local mirror existed only until step 5
+ * wired the API client — that switch point is here; the mirror is deleted).
+ * `VERDICT_VARIANT` stays local: it maps the shared union onto this repo's
+ * theme tokens (green/red duality; REVOKED renders red).
  */
-export const VERDICTS = ["VERIFIED", "IMPOSTOR", "UNVERIFIED", "REVOKED"] as const;
-export type Verdict = (typeof VERDICTS)[number];
+import type { Verdict } from "vetted-shared";
+
+export { VERDICTS } from "vetted-shared";
+export type { Verdict };
 
 /** Theme variant per verdict — the green/red duality; REVOKED is red. */
 export type VerdictVariant = "verified" | "risk" | "advisory";

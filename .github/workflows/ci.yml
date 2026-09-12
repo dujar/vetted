@@ -55,6 +55,11 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
         working-directory: frontend
+      # frontend depends on vetted-shared via file:../packages/shared — npm does
+      # not install a file: package's own dependencies, and tsc/vite must resolve
+      # viem from packages/shared/abi.ts (step-5; flagged to the step-1 owner).
+      - run: npm ci
+        working-directory: packages/shared
       - name: tsc + vite build
         run: npm run build
         working-directory: frontend

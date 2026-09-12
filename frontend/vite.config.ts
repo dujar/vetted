@@ -10,5 +10,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   test: {
     environment: "jsdom",
+    // globals:true registers testing-library's auto-cleanup afterEach —
+    // without it DOM leaks between component tests.
+    globals: true,
   },
 });
