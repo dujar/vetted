@@ -24,9 +24,16 @@ All three mockup screens are clickable end-to-end against fixture data, and live
 - Mock sentinels for demo/tests: `MOCK_VERIFIED_ADDR` (NVIDIA), `MOCK_IMPOSTOR_ADDR` (twin), `MOCK_REVOKED_ADDR` (upgrade beat), `MOCK_NOT_CONTRACT_ADDR`, `MOCK_RPC_ERROR_ADDR`, plus guard-outcome tokens `MOCK_PAUSED_ADDR`/`MOCK_BLOCKLISTED_ADDR`/`MOCK_IMPL_MISMATCH_ADDR` in `lib/mockData.ts`.
 - Registry no-record rule: zero registrar or status u8 outside {0,1} decodes to no-record (wire.md; guard order then yields `GUARD_NO_RECORD`).
 - Live probe failures degrade to "probe unavailable" advisory rows — heuristics never revert or block (spec.md:28); only real guard reverts refuse.
-- Deep links are hash-based: `#/?addr=0x…`, compare `#/?addr=A&addr=B` (URLSearchParams.getAll); journeys.md's bare `?addr=` works once served through the app root.
+- Deep links work in BOTH formats: the in-app `#/?addr=0x…` / compare `#/?addr=A&addr=B`, and journeys.md:9's bare `?addr=0x…` / `?addr=A&addr=B` — `parseHash` falls back to `location.search` when the hash carries no query (review round 1 blocking fix; hash query wins once the user navigates in-app).
 - vitest config got `globals: true` (testing-library auto-cleanup) — shared-package tests unaffected (own config).
 - Renaming the product: edit `lib/brand.ts` only.
+
+## Review round 1 (1 blocking + 3 non-blocking) — all fixed
+
+1. BLOCKING — bare-query entry (`?addr=0x…`, journeys.md:9) rendered the hero because parseHash read only location.hash: FIXED with the ~2-line `location.search` fallback (hash query wins when present); router unit tests + component tests for both formats added.
+2. Dead `previewChecks` forwarder + `classifyExecuteError` re-export in wallet.ts: deleted.
+3. Scan effect not re-keyed on chainId (stale cards on network switch): scan key is now `${chainId}|${addrKey}`; test asserts the rescan renders the non-4663 notice.
+4. Depth-boundary banner wrongly appended to non-4663 scans (their UNVERIFIED verdict comes from the chain, not the pattern): banner now renders only when `notice === null`; test added.
 
 ## Out of scope, left broken
 

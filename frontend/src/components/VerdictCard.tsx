@@ -111,11 +111,13 @@ export function VerdictCard({ response, swapHref = "#/swap" }: { response: ScanR
             <a href={row.evidenceUrl} target="_blank" rel="noreferrer">evidence</a>
           </div>
         ))}
-        <div className="banner advisory" style={{ marginTop: "var(--s3)" }}>
-          Depth boundary: full verdicts cover the Robinhood stock-token pattern (signature match). This
-          contract is off-pattern, so every line above is a structural heuristic — advisory only, never a
-          verdict.
-        </div>
+        {response.notice === null ? (
+          <div className="banner advisory" style={{ marginTop: "var(--s3)" }}>
+            Depth boundary: full verdicts cover the Robinhood stock-token pattern (signature match). This
+            contract is off-pattern, so every line above is a structural heuristic — advisory only, never a
+            verdict.
+          </div>
+        ) : null}
       </section>
     );
   }

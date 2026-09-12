@@ -64,13 +64,16 @@ export function ScanPage({
   }, [chainId, watchdog]);
 
   const addrKey = addrs.join(",");
+  // Key on chain too — switching the network selector rescans instead of
+  // leaving stale cards from the previous chain (review round 1).
+  const scanKey = `${chainId}|${addrKey}`;
   const scannedKey = useRef("");
   useEffect(() => {
-    if (addrKey === "" || scannedKey.current === addrKey) return;
-    scannedKey.current = addrKey;
+    if (addrKey === "" || scannedKey.current === scanKey) return;
+    scannedKey.current = scanKey;
     void runScan(addrs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addrKey]);
+  }, [scanKey]);
 
   async function runScan(list: string[]) {
     setRuns(list.map((addr) => ({ addr, phase: "loading" as const })));

@@ -12,15 +12,21 @@ export interface Route {
   query: URLSearchParams;
 }
 
-export function parseHash(hash: string): Route {
+/**
+ * Query precedence: the hash's own query when present (`#/?addr=…`), else the
+ * bare `location.search` — journeys.md:9's documented entry format
+ * (`?addr=0x…`, compare `?addr=0xA…&addr=0xB…`) carries no hash at all and
+ * must still land on the scan (review round 1, blocking fix).
+ */
+export function parseHash(hash: string, search = ""): Route {
   const raw = hash.replace(/^#/, "");
-  const [pathPart, search = ""] = raw.split("?");
+  const [pathPart, hashSearch] = raw.includes("?") ? raw.split("?") : [raw, undefined];
   const path = pathPart === "" ? "/" : pathPart;
-  return { path, query: new URLSearchParams(search) };
+  return { path, query: new URLSearchParams(hashSearch ?? search) };
 }
 
 function currentRoute(): Route {
-  return parseHash(window.location.hash);
+  return parseHash(window.location.hash, window.location.search);
 }
 
 export function useHashRoute(): Route {

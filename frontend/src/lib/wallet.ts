@@ -11,13 +11,10 @@ import { GUARD_ABI } from "vetted-shared";
 
 import { robinhoodChain } from "./chains";
 import {
-  classifyExecuteError,
   getGuardProbeSource,
-  previewGuard,
   GuardExecutionRequest,
   GuardExecutionResult,
   GuardExecutor,
-  GuardProbeSource,
   createMockGuardExecutor,
 } from "./guard";
 import { isLiveApi } from "./api";
@@ -110,10 +107,3 @@ export function useWalletAdapter(): WalletAdapter {
     execute,
   };
 }
-
-/** Shared by preview rendering and the execution outcome — one source of truth. */
-export function previewChecks(source: GuardProbeSource, token: string, buyer: string) {
-  return previewGuard(source, { token, buyer });
-}
-
-export { classifyExecuteError };

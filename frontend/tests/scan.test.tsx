@@ -160,6 +160,30 @@ describe("compare deep link (?addr=&addr=)", () => {
     expect(screen.getByText(MOCK_VERIFIED_ADDR)).toBeTruthy();
     expect(screen.getByText(MOCK_IMPOSTOR_ADDR)).toBeTruthy();
   });
+
+  it("also works as the journeys.md:9 bare query (?addr=0xA…&addr=0xB…, no hash)", async () => {
+    window.history.replaceState(null, "", `/?addr=${MOCK_VERIFIED_ADDR}&addr=${MOCK_IMPOSTOR_ADDR}`);
+    try {
+      render(<ScanPage chainId={4663} client={new MockScanClient()} watchdog={watchdog} />);
+      expect(await screen.findByText("VERIFIED")).toBeTruthy();
+      expect(screen.getByText("IMPOSTOR")).toBeTruthy();
+    } finally {
+      window.history.replaceState(null, "", "/");
+    }
+  });
+});
+
+describe("bare-query entry format (journeys.md:9 — blocking review fix)", () => {
+  it("scans ?addr=0x… with no hash instead of rendering the hero", async () => {
+    window.history.replaceState(null, "", `/?addr=${MOCK_VERIFIED_ADDR}`);
+    try {
+      render(<ScanPage chainId={4663} client={new MockScanClient()} watchdog={watchdog} />);
+      expect(await screen.findByText("VERIFIED")).toBeTruthy();
+      expect(screen.queryByText("Is this stock token real — and what can it do to you?")).toBeNull();
+    } finally {
+      window.history.replaceState(null, "", "/");
+    }
+  });
 });
 
 describe("unhappy paths", () => {
@@ -198,5 +222,22 @@ describe("unhappy paths", () => {
     expect(screen.getByText(/scanned read-only/)).toBeTruthy();
     fireEvent.click(screen.getByText("Switch to 4663"));
     expect(onChainChange).toHaveBeenCalledWith(4663);
+  });
+
+  it("non-4663 scan does not claim the token is off-pattern (no depth-boundary banner)", async () => {
+    renderScan(MOCK_VERIFIED_ADDR, new MockScanClient(), 421614);
+    await screen.findByText("wrong network");
+    expect(screen.queryByText(/Depth boundary: full verdicts cover/)).toBeNull();
+  });
+
+  it("switching the network selector rescans instead of leaving stale cards", async () => {
+    const { rerender } = render(
+      <ScanPage chainId={4663} client={new MockScanClient()} watchdog={watchdog} />,
+    );
+    window.location.hash = `#/?addr=${MOCK_VERIFIED_ADDR}`;
+    expect(await screen.findByText("VERIFIED")).toBeTruthy();
+    rerender(<ScanPage chainId={421614} client={new MockScanClient()} watchdog={watchdog} />);
+    expect(await screen.findByText("wrong network")).toBeTruthy();
+    expect(screen.getByText(/scanned read-only/)).toBeTruthy();
   });
 });
