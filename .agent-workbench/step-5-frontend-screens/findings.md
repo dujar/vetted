@@ -1,7 +1,7 @@
 # Step 5 — frontend screens (scan / swap / registry)
 
 status:     ready-to-merge (review pending — see below)
-branch:     step-5-frontend-screens (pushed; CI frontend job expected green — tsc + build + 76 tests pass locally, shared suite 15/15 untouched)
+branch:     step-5-frontend-screens (pushed, draft PR #2; CI run 34665443813 SUCCESS — all four jobs green incl. frontend tsc+build+76 tests)
 deployed:   not deployed (pages redeploy is step 8/10's job)
 
 ## What was built
@@ -11,7 +11,7 @@ All three mockup screens are clickable end-to-end against fixture data, and live
 ## Where the plan was wrong
 
 - No router existed (verify loose end 2): picked the hash-router option (no new dep; survives static Pages hosting without SPA-fallback config). `App.tsx` is a deliberate step-5 edit; `main.tsx` needed no change.
-- `vetted-shared` was not importable (verify loose end 1): added `file:../packages/shared` dep + lock refresh; also had to add `resolveJsonModule` to frontend tsconfig for the fixture imports (not in the fix as written, same seam).
+- `vetted-shared` was not importable (verify loose end 1): added `file:../packages/shared` dep + lock refresh; also had to add `resolveJsonModule` to frontend tsconfig for the fixture imports (not in the fix as written, same seam). CI then caught the second half: npm does not install a `file:` package's own dependencies, so the clean frontend job could not resolve viem from `packages/shared/abi.ts` — one added CI step (`npm ci` in packages/shared inside the frontend job). That edits step-1's `.github/workflows/ci.yml`: minimal, necessary, flagged here for the step-1 owner to accept at merge.
 - `/watchdog` had no wire type (verify loose end 3): `WatchdogStats {chainId, runs, baselinePerDay}` declared locally in `api.ts`, flagged for step-8 reconciliation. Mock numbers inline (loose end 4).
 - Registry had no data source (verify loose end 5): known-token list constant in `mockData.ts` (mock + live identical) drives per-address getRecord + erc20 symbol reads.
 - Revocation-tx evidence (verify loose end 6): mock mode renders the fixture-style tx (drill-in); live mode shows reason + revokedAt and "not indexed yet" until step 3 emits a Revoked event — step 3/8 should coordinate there.
