@@ -21,3 +21,35 @@ Set judged: steps 1–10 vs `.agent-workbench/product/spec.md` (approved 2026-09
 ## Verdict
 
 3 gaps. Coverage, phases, ordering, parallel-safety, and calendar are sound; the set reaches a finished, submittable product once the three gaps above are patched — gap 1 is the blocking one (it stalls step 8 mid-build or silently re-scopes its on-chain coverage).
+
+---
+
+# Plan judgment — round 2, reconciliation re-check (2026-09-12)
+
+Scope of this pass: not a fresh judgment — step 1 is done (5e2ff35) and a3159d7 folded step-1 findings into plans 2–10 (record: `reconciliation/2026-09-12-step-1-findings.md`). Checked the nine `> **Revised**` notes against each other, the tracker's dependency graph, the repo at a3159d7, and spec.md/journeys.md. Round-1 gaps 1–3 are all closed in current plan text (details below). Set remains SHIPPABLE.
+
+## (1) Reconciliations keep the set SHIPPABLE — no contradiction with tracker or each other
+
+- Round-2 gap-1 fix verified: step-8 goal now reads "does NOT target 4663 — the first 4663 registry+guard deploy is step 7, which runs in parallel; the live-4663 journey pass is step 9's dry runs + step 10's production smoke"; task 5 seeds scratch-chain state with step 3's integration registrar key; step-9 task 6 carries the 4663-only-divergence blocking-fix rule; step-10 task 3 is the production smoke. Step 8's depends-on (3,4,5,6) is now true — its on-chain targets (421614/46630) are written by exactly 3 and 6 (Revised note 2 names them).
+- Round-2 gap-2 fix verified in the merged repo: `packages/shared/abi.ts` ships REGISTRY_ABI/GUARD_ABI/SELECTORS/GUARD_REVERT_REASONS literals plus the PROBE_SELECTORS reserved block (:49/:57, verified). Step 2's only touch outside `spike/` is replacing that block at merge with the shared vitest suite as tripwire (task 5); step 5 imports the constant and its mock-mode tests are fixture-driven so placeholders are tolerated (task 3) — step 5's depends-on=1 stays true, no hidden step-2 edge.
+- Round-2 gap-3 fix verified: step-7 task 5 pins the registrar-key handoff (generate → set backend `REGISTRAR_KEY` → deploy with / transfer to that address); step-10 task 2 audits registrar-address equality.
+- No Revised note contradicts another: serde-rename wire naming (steps 3/4) matches step-1 findings' `RECORD_REVOKED` note; on-chain `GUARD_*` strings stay byte-pinned in step-3 task 3 and are imported from `GUARD_REVERT_REASONS` by step 8 (Revised note 1). Worker-build correction (steps 2/4) matches the merged `scan-backend/wrangler.toml`. RPC pre-probe notes (3/4/5/6/7/8) all point at the same wire.md/chains.ts pins, verified live in the tree.
+
+## (2) No new collisions between parallel steps
+
+- Batch [2,5]: step 2's one shared file (`packages/shared/abi.ts` PROBE_SELECTORS) is a merge-time replacement absorbed under the tracker's one-at-a-time merge rule; step 5 is import-only (Revised note 4). No rewrite overlap.
+- Batch [3,4,6 (+5)]: scopes are disjoint (`contracts/core` vs `scan-backend/**` vs `contracts/replicas` + `scripts/deploy/replicas` + `demo/assets.md` vs `frontend/src/**`). The one shared file pair — `deployments/421614.json`/`46630.json`, appended by 3 (pinned writer) and 6 — is append-only, declared in both plans' Revised notes with the merge-conflict note (tracker Next §4). Append point, not a dependency. packages/shared touches on both sides are append-point module adds only.
+- Pair [7,8]: disjoint — 7 touches `contracts/core` tests/docs + `docs/` + `deployments/4663.json` (a file step 3 explicitly never writes); 8 creates `e2e/**` only.
+- Repo grounding: `deployments/{worker,pages}.json` exist (step 9's Revised URL sources resolve); `frontend/src/components/verdicts.ts`, `lib/chains.ts`, `lib/wagmi.ts` exist as step 5's Revised notes cite; `spike/` and `docs/` absent as expected (creates by steps 2 and 7; step 5's `docs/criteria.md` link is the declared step-7 handoff, checked in step 7's own Check line).
+
+## (3) Spike-gate FAIL branch still intact
+
+Step 3 Stack + open question carry the same-day Solidity rewrite (identical scope/revert strings/tests, foundry replaces cargo-stylus, tracker row stays step 3, coordinator flagged). Revised note 5 explicitly hands the pinned SELECTORS/revert strings to the FAIL branch; step 3's Resources cite contract-verification.md for the `forge verify-contract` Etherscan-v2 recipe; steps 4/5/6 are genuinely unaffected because they build against step-1's `packages/shared` pins, and step 6 is Solidity regardless. Step 7 Stack covers "or the Solidity branch of it". Gate date (2026-09-18, step-2 task 10) unchanged; steps 3/4/6 still cannot start before the GATE line exists (declared in each learned line).
+
+## (4) Nothing broken or dangling
+
+Task-number references in every Revised note match the owning plan's Tasks section (re-verified: step 2 T2/T7, step 3 T1/T3/T5, step 4 T1/T4, step 5 T1/T3, step 6 T7, step 8 T1/T3/T6). Forward `learned:` references to not-yet-existing findings.md files are by design. The step-1 findings `reconciled:` dating is deliberately withheld until this verdict (reconciliation record, Deferred) — reconcile-agent can date it now. Known non-gap, unchanged from round 1: the tracker's files-in-scope column for step 6 doesn't list the deployments append the plan declares — the plan text is authoritative and consistent.
+
+## Verdict
+
+SHIPPABLE. The reconciled set is internally consistent, the dependency graph matches actual file behavior, the gate branch survives, and the three round-1 gaps are closed in merged or planned text. No new gaps introduced by a3159d7.

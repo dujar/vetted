@@ -3,6 +3,7 @@
 status:     merged
 branch:     step-1-repo-scaffold (PR #1, merged into main as 5e2ff35; merge suite green)
 deployed:   worker https://vetted-scan-backend.dujar-coding.workers.dev (GET /health → {"ok":true}) · pages https://vetted-1un.pages.dev (HTTP 200) · GitHub https://github.com/dujar/vetted (public)
+reconciled: 2026-09-12  (folded into plans 2–10 — commit a3159d7; record: reconciliation/2026-09-12-step-1-findings.md; plan-judge round 2: SHIPPABLE)
 
 ## What was built
 

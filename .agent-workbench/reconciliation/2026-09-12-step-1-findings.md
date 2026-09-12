@@ -87,13 +87,18 @@ against the findings prose:
   from the merge, found in the working tree and preserved (not this round's
   edit; not modified further).
 
-## Deferred / open
+## Judge round and closure
 
-- `reconciled:` dating of `../step-1-repo-scaffold/findings.md` is withheld
-  until the plan-judge verdict lands on this set — the undated marker is
-  what brings reconcile-agent back if the judge finds gaps.
-- plan-judge-agent round pending: no spawn tool in the reconcile context;
-  the caller dispatches it and re-invokes reconcile-agent.
+- plan-judge-agent round 2 (dispatched by the caller after a3159d7; verdict:
+  `.agent-workbench/plan-judgment.md`): **SHIPPABLE** — "the reconciled set is
+  internally consistent, the dependency graph matches actual file behavior,
+  the gate branch survives, and the three round-1 gaps are closed in merged
+  or planned text. No new gaps introduced by a3159d7." Its three round-1 gaps
+  (step-8 4663 dependency, step-1-ships-read-ABI, registrar-key handoff) were
+  all verified closed — the ABI and handoff gaps by scaffold/plan text this
+  reconciliation folded in.
+- `reconciled: 2026-09-12` stamped on `../step-1-repo-scaffold/findings.md`
+  after the verdict (commit with this line).
 - Review note 2 (step-1 plan.md:45 stale `blocked-auth` parenthetical) stays
   ACCEPTED AS IS per the findings disposition — a done step's plan is a
   historical record and was not touched.
