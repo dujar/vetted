@@ -5,6 +5,14 @@
 - journeys: ../product/journeys.md  (J2 revert reasons verbatim journeys.md:32; J3 contract-callable read interface journeys.md:43)
 - knows:   ../knowledge/stylus-toolchain.md, ../knowledge/robinhood-chain.md, ../knowledge/arbitrum-sepolia.md, ../knowledge/contract-verification.md  (Arbitrum Sepolia = Etherscan v2 `chainid=421614` :27–38 — the FAIL branch's `forge verify-contract` needs this; per-chain v1 endpoints are dead)
 - learned: ../step-2-spike-gate/findings.md  (GATE decision, calibrated fingerprint + probe selectors, gas actuals — this step must not start until step 2's GATE line exists)
+- learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — crate header shape, workspace layout, live-probed RPCs, deployments writer pins)
+
+> **Revised** — step-1 findings reconciliation (2026-09-11):
+> 1. Task 1/3 crates: native `stylus_sdk::testing` tests do not compile without the template header — copy it from `contracts/core/hello/src/lib.rs` into both new crates: `#![cfg_attr(not(any(test, feature="export-abi")), no_main/no_std)]` + `#[macro_use] extern crate alloc;` (storage macros expand `alloc::` paths).
+> 2. `contracts/Cargo.toml` members glob is `core/*` and the release profile (lto, panic=abort) sits at the workspace root — drop the crates in; no workspace edit.
+> 3. Task 5's 46630 target: RPC `https://rpc.testnet.chain.robinhood.com` (`eth_chainId → 0xb626`) is already live-probed — recorded in `packages/shared/wire.md` chains table and `frontend/src/lib/chains.ts`. Do not re-probe.
+> 4. This step is the pinned writer of `deployments/421614.json` + `46630.json` per `deployments/README.md` — append-only; step 6 appends replica fields to the same files in parallel, take the small conflicts at merge (tracker Next §4).
+> 5. Task 1's signatures must match `packages/shared/abi.ts` byte-for-byte — SELECTORS are pinned literals there (getRecord `0x617fba04`, verify `0x73c7cf61`, revoke `0xafd0224b`, commit `0x498ab631`, execute `0x61461954`) with a vitest recompute test as tripwire; wire-level revert-reason naming (e.g. `RECORD_REVOKED`) is settled by explicit `#[serde(rename)]` in `types.ts` — the GATE:FAIL Solidity branch inherits the same pinned strings.
 
 ## Stack
 Rust/Stylus (stylus-sdk 0.10.9) per spec.md:49.

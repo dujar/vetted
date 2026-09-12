@@ -6,7 +6,13 @@
 - screens: ../product/screens/scan.html, ../product/screens/swap.html, ../product/screens/registry.html
 - theme:   ../product/theme.css, ../product/components.html  (tokens + primitives already coded in step 1)
 - knows:   ../knowledge/frontend-stack.md, ../knowledge/robinhood-chain.md
-- learned: (no dependency has findings yet — step 5 builds against step-1 fixtures. The registry read ABI is step-1-created: `packages/shared/abi.ts`; step 2's calibrated probe selectors land in that same file's `PROBE_SELECTORS` block at its merge — code against the exported constant, never against step-2 findings directly)
+- learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — step 5 builds against step-1 fixtures. The registry read ABI is step-1-created: `packages/shared/abi.ts`; step 2's calibrated probe selectors land in that same file's `PROBE_SELECTORS` block at its merge — code against the exported constant, never against step-2 findings directly)
+
+> **Revised** — step-1 findings reconciliation (2026-09-11):
+> 1. Task 1 (api client wiring): the scaffold deliberately duplicated the verdict union at `frontend/src/components/verdicts.ts` (not `lib/`) — switch its imports to `vetted-shared` when wiring the API client and delete the local mirror; the in-file comment marks the switch point.
+> 2. Task 3 (wallet connect): `frontend/src/lib/wagmi.ts` `getWagmiConfig()` is lazy and env-gated — without `VITE_WALLETCONNECT_PROJECT_ID` the app boots read-only with ZERO connectors and does not throw. The connect UI must handle the zero-connector state gracefully (prompt for the operator's WalletConnect Cloud projectId rather than crashing); this env var is the only outstanding operator action in the whole project.
+> 3. Chains are already coded in `frontend/src/lib/chains.ts` (4663 + 46630 with live-probed RPCs; 421614 re-exports viem's `arbitrumSepolia`) — consume, do not redefine or re-probe.
+> 4. `packages/shared/abi.ts` exports REGISTRY_ABI / GUARD_ABI / SELECTORS / GUARD_REVERT_REASONS as pinned literals — import the exported constants everywhere (including guard-preview revert strings); never retranscribe.
 
 ## Stack
 Vite 8.3 + React 19.3 + Tailwind 4.3 + wagmi 3.7.7 built-in connectors (decision made in step 1) + viem 2.56.3 for all reads.

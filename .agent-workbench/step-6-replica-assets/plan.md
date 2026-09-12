@@ -5,6 +5,12 @@
 - journeys: ../product/journeys.md  (compare deep link journeys.md:9; J2 revert beat :32)
 - knows:   ../knowledge/robinhood-stock-tokens.md  (genuine naming/decimals :20–33; the beacon+blocklist+pause pattern's provenance is xroot.dev, third-party — the replicas ARE its verification path :34–39), ../knowledge/contract-verification.md  (Blockscout recipes + the 4663 Cloudflare-challenge footgun :19–27)
 - learned: ../step-2-spike-gate/findings.md  (calibrated fingerprint the replicas must reproduce; 4663 gas verified; beacon smoke result — must exist before this step starts)
+- learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — live-probed RPCs, deployments append-point rules, `demo/` reserved)
+
+> **Revised** — step-1 findings reconciliation (2026-09-11):
+> 1. Task 7's rehearsal targets: RPC `https://rpc.testnet.chain.robinhood.com` (46630, `eth_chainId → 0xb626`) and the 421614 endpoint are already live-probed and pinned in `packages/shared/wire.md` chains table + `frontend/src/lib/chains.ts` — no endpoint discovery.
+> 2. `deployments/<chain>.json` appends: the pinned writers per `deployments/README.md` are step 3 (`421614.json`/`46630.json`) and step 7 (`4663.json`); this step runs in parallel with step 3 and appends replica fields to the same files — append-only, take the small conflicts at merge (tracker Next §4).
+> 3. `demo/` exists in the tree (`.gitkeep` added in review round 1) — `demo/assets.md` is a create, not a dir bootstrap.
 
 ## Stack
 Solidity 0.8.x + OpenZeppelin Upgradeable (beacon), Foundry for tests + deploys. Replicas are **demo assets, deliberately isolated from the Rust core** (spec.md:38) — a separate foundry project under `contracts/replicas/`, never imported by core.

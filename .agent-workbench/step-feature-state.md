@@ -9,7 +9,7 @@ No epics ledger — v1 planned directly from the approved spec.md.
 
 | step | phase | feature            | dir                           | status  | depends on | window              | files in scope (no collisions between parallel steps) |
 |------|-------|--------------------|-------------------------------|---------|------------|---------------------|--------------------------------------------------------|
-| 1    | 1     | repo-scaffold      | step-1-repo-scaffold/         | planned | —          | Sep 12–13           | repo root, CI, packages/shared/, frontend scaffold+tokens/primitives, toolchain docs, deployments/ layout |
+| 1    | 1     | repo-scaffold      | step-1-repo-scaffold/         | done    | —          | Sep 12–13           | repo root, CI, packages/shared/, frontend scaffold+tokens/primitives, toolchain docs, deployments/ layout |
 | 2    | 1     | spike-gate         | step-2-spike-gate/            | planned | 1          | Sep 12–18 (gate 9-18) | spike/**, spike/findings.md + one merge-time append: packages/shared/abi.ts PROBE_SELECTORS block |
 | 3    | 2     | contracts-core     | step-3-contracts-core/        | planned | 1, 2       | Sep 19–26           | contracts/core/**, scripts/deploy/core/, deployments/*.json (append) |
 | 4    | 2     | scan-backend       | step-4-scan-backend/          | planned | 1, 2       | Sep 19–26           | scan-backend/** |

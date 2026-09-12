@@ -5,6 +5,9 @@
 - journeys: ../product/journeys.md  (arc ↔ journey mapping, journeys.md:47)
 - knows:   ../knowledge/robinhood-chain.md (RPC/explorer URLs :14–21), ../knowledge/goplus-api.md (copy branch :26–27)
 - learned: ../step-3-contracts-core/findings.md, ../step-4-scan-backend/findings.md, ../step-6-replica-assets/findings.md, ../step-8-e2e-journeys/findings.md
+- learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — live-verified RPC/URL table, production worker+pages already deployed)
+
+> **Revised** — step-1 findings reconciliation (2026-09-11): the runbook's endpoints and beat URLs come from the live-verified table in `packages/shared/wire.md` (chains) and `deployments/{worker,pages}.json` — the production worker (`vetted-scan-backend.dujar-coding.workers.dev`) and Pages (`vetted-1un.pages.dev`) have been live since step 1. Caveat carried in findings: per-deployment URL probes intermittently failed TLS from the dev machine only — if a beat URL "fails" during a dry run, re-check from off-machine before rewriting the runbook fallback.
 
 ## Stack
 Bash + cast + OBS recording; no new runtime dependencies.

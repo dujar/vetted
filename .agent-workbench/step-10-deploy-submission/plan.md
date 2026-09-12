@@ -4,6 +4,9 @@
 - spec:    ../product/spec.md   (pre-submission checklist spec.md:71; constraints spec.md:69; risks spec.md:73–80)
 - knows:   ../knowledge/robinhood-chain.md, ../knowledge/arbitrum-sepolia.md, ../knowledge/goplus-api.md, ../knowledge/eas.md, ../knowledge/contract-verification.md  (rehearsed Q&A ammo; verification re-check recipes :12–38)
 - learned: ../step-7-contract-hardening/findings.md, ../step-9-demo-harness/findings.md
+- learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — deploy pipeline proven, env audit facts)
+
+> **Revised** — step-1 findings reconciliation (2026-09-11): task 2's env audit needs no deploy-credential work — the wrangler OAuth token already has workers+pages scopes (hello worker + Pages live since step 1: `vetted-scan-backend.dujar-coding.workers.dev`, `vetted-1un.pages.dev`, alias in `deployments/pages.json`). The **only outstanding operator action in the whole project is the WalletConnect Cloud projectId** (`VITE_WALLETCONNECT_PROJECT_ID`) — without it the frontend boots read-only with zero connectors by design (not a bug). Check task's URL resolution: per-deployment URL probes intermittently failed TLS from the dev machine only — treat a local TLS failure as suspect and re-verify from off-machine before flagging a URL dead.
 
 ## Stack
 As built; no new dependencies.

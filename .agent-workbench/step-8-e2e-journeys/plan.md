@@ -5,6 +5,12 @@
 - journeys: ../product/journeys.md  (the contract: one e2e per journey + every listed unhappy path)
 - knows:   ../knowledge/frontend-stack.md, ../knowledge/robinhood-chain.md
 - learned: ../step-3-contracts-core/findings.md, ../step-4-scan-backend/findings.md, ../step-5-frontend-screens/findings.md, ../step-6-replica-assets/findings.md
+- learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — pinned selectors/revert-reason literals, live-probed RPCs, e2e/ reserved)
+
+> **Revised** — step-1 findings reconciliation (2026-09-11):
+> 1. Task 3's byte-exact revert assertions: `packages/shared/abi.ts` exports SELECTORS and GUARD_REVERT_REASONS as pinned literals (kept literal precisely so e2e can use them without a runtime) — import them in the specs; never retranscribe strings or selectors.
+> 2. Task 1's fixture loader reads `deployments/*.json` — writers are step 3 (`421614.json`/`46630.json`) and step 6 (replica fields appended to the same files); the scratch-chain RPC (46630 = `https://rpc.testnet.chain.robinhood.com`) is live-probed and pinned in `packages/shared/wire.md` + `frontend/src/lib/chains.ts`.
+> 3. `e2e/` exists in the tree (`.gitkeep` added in review round 1) — survives clean checkout; CI will not see these specs per-push (step task 6's on-demand mode is deliberate).
 
 ## Stack
 Playwright + an injected EIP-1193 stub wallet (provider shim backed by a funded demo key on the scratch chain — 46630, or 421614 if step-2 findings say 46630 gas never materialized) — real signatures against real deployments, no browser-extension flakiness.

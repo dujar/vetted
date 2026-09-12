@@ -5,6 +5,12 @@
 - journeys: ../product/journeys.md  (J1 states journeys.md:12–22; degraded banner :20; watchdog :15)
 - knows:   ../knowledge/workers-rust.md, ../knowledge/robinhood-chain.md, ../knowledge/robinhood-stock-tokens.md, ../knowledge/goplus-api.md, ../knowledge/rust-wasm-signing.md
 - learned: ../step-2-spike-gate/findings.md  (calibrated fingerprint + probe selectors; /rhj/assets sample; beacon-resolution mechanics — must exist before this step starts)
+- learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — working hello worker in `scan-backend/`, wire contract pins, live-probed RPCs)
+
+> **Revised** — step-1 findings reconciliation (2026-09-11):
+> 1. `scan-backend/` already contains the deployed hello worker (workers-rs 0.8.5, `/health` live) — build path is `worker-build@^0.8` producing `build/index.js`; knowledge workers-rust.md's "no separate build step" is stale. Reuse the existing crate shape and `wrangler.toml`; deploy credentials proven (OAuth token has workers+pages scopes).
+> 2. Task 4's wire shape: `packages/shared/wire.md` is the source of truth (`GET /scan?chainId&addr`; `status` u8→"VERIFIED"/"REVOKED"; `riskFlags` u256 as decimal string). Extend shared types only via append points (`index.ts` / `src/lib.rs` / new module files); the Rust side already carries explicit per-variant `#[serde(rename)]` (e.g. `RecordRevoked` → `RECORD_REVOKED`) — don't re-derive naming. Shape changes touch `types.ts` + `types.rs` + fixtures + both round-trip tests together.
+> 3. Task 1's RPC endpoints for 4663/46630/421614 are already live-probed and pinned in `packages/shared/wire.md` chains table + `frontend/src/lib/chains.ts` — use them; no endpoint discovery.
 
 ## Stack
 workers-rs 0.8.5 on Cloudflare Workers — stateless, no DB (spec.md:56); alloy-consensus primitives + k256 for RPC and registrar signing compiled to wasm.

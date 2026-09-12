@@ -4,6 +4,9 @@
 - spec:    ../product/spec.md   (judging weights spec.md:69; criteria-published requirement spec.md:35; ≤200k budget spec.md:51; risks spec.md:73–80)
 - knows:   ../knowledge/stylus-toolchain.md (verify + reproducible builds :33–36), ../knowledge/robinhood-chain.md (96 KB limits :38), ../knowledge/contract-verification.md (explorer recipes + the 4663 Cloudflare-challenge footgun :19–27 — applies to any verify path, not just forge)
 - learned: ../step-3-contracts-core/findings.md  (build notes, gas actuals, integration harness)
+- learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — deployments writer pins, live-probed 4663 RPC)
+
+> **Revised** — step-1 findings reconciliation (2026-09-11): this step is the pinned writer of `deployments/4663.json` per `deployments/README.md` (append-only — never rewrite step 3's scratch entries), and the 4663 RPC endpoint is already live-probed and pinned in `packages/shared/wire.md` chains table + `frontend/src/lib/chains.ts` — use it for the deploy `--endpoint`; no re-probing.
 
 ## Stack
 Same as step 3 (or the Solidity branch of it).
