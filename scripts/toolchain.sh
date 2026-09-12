@@ -10,10 +10,9 @@ CARGO_STYLUS_VERSION="0.10.9"
 
 rustup target add wasm32-unknown-unknown
 
-if ! command -v cargo-stylus >/dev/null 2>&1 \
-  || ! cargo-stylus --version 2>/dev/null | grep -q "$CARGO_STYLUS_VERSION"; then
+if ! cargo stylus -V 2>/dev/null | grep -q "$CARGO_STYLUS_VERSION"; then
   echo "installing cargo-stylus $CARGO_STYLUS_VERSION from crates.io..."
   cargo install cargo-stylus --version "$CARGO_STYLUS_VERSION" --locked
 fi
 
-cargo-stylus --version
+cargo stylus -V
