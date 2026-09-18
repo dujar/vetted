@@ -19,3 +19,6 @@ out/
 # Editors / OS
 .DS_Store
 *.log
+# Spike gate evidence is load-bearing record (review round 1, blocking fix) —
+# keep its logs tracked even though *.log is ignored elsewhere.
+!spike/evidence/**

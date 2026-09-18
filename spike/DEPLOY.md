@@ -68,6 +68,13 @@ metadata hash 3ab96a63…0359). Note each chain's probe address.
 
 ## 4. Flip the GATE line
 
+PASS formula (verify.md loose end 5, restated so it never dangles): the GATE is
+decided by activation-proven-on-4663 (`cargo stylus check` exit 0 — already
+done, see evidence/stylus_check_4663_421614.log) PLUS the probe-suite/gas
+receipts measured on whichever chain got funded (421614 suffices), recorded
+with that caveat on the GATE line. Both halves present → PASS; activation
+failed or gas > 200,000 → FAIL.
+
 Set `spike/findings.md` line 1 to the literal
 `GATE: PASS — Stylus everywhere` (or FAIL if any step above contradicts the
 expectations), paste the gas actuals into the Gas section, commit.
