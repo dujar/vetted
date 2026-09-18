@@ -1,0 +1,102 @@
+{
+  "title": "Step-2 task-5 pattern calibration — live reads on Robinhood Chain 4663",
+  "captured": "2026-09-19 (fresh RPC session; original bytecode evidence fetched by the prior run, re-verified byte-identical this session)",
+  "rpc": "https://rpc.mainnet.chain.robinhood.com (eth_chainId 0x1237 = 4663, verified live)",
+  "read_only": "every value below was obtained with eth_getStorageAt / eth_getCode / eth_call — no funds required",
+  "tokens": {
+    "P":   { "name": "Everpure • Robinhood Token",  "address": "0x1Cdad396DB64BDa184d5182A97Dd9B3C62100b7D" },
+    "CRM": { "name": "Salesforce • Robinhood Token", "address": "0xd95B44124e475743a7589e68F3D74008A5536D44" }
+  },
+  "eip1967_slots": {
+    "impl_slot":   "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
+    "beacon_slot": "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50"
+  },
+  "slot_reads": {
+    "P_impl_slot":   "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "P_beacon_slot": "0x000000000000000000000000e10b6f6b275de231345c20d14ab812db62151b00",
+    "CRM_beacon_slot": "0x000000000000000000000000e10b6f6b275de231345c20d14ab812db62151b00",
+    "note": "BOTH tokens point at the SAME beacon; impl slot empty (beacon-proxy layout, as guessed); beacon slot is the resolution anchor"
+  },
+  "beacon": {
+    "address": "0xe10b6f6b275de231345c20d14ab812db62151b00",
+    "code_len": 2332,
+    "codehash": "0x8b465c0b53a2ba499566e9b4ca67d8c90ed6131743df806a570d156956a7e90e",
+    "implementation()": "0xb35490d6f9163de4f80d88dc75c3516eb64c5ae2",
+    "paused()": false,
+    "isBlocked(address)": "answers here (returned false for a fresh EOA) — the blocklist STATE lives on the beacon",
+    "dispatcher_selectors_observed": [
+      "0x01ffc9a7 supportsInterface(bytes4)", "0x248a9ca3 getRoleAdmin(bytes32)", "0x2f2ff15d grantRole(bytes32,address)",
+      "0x36568abe setRoleAdmin(bytes32,bytes32)", "0x3659cfe6 upgradeTo(address)", "0x3f4ba83a unpause()",
+      "0x5c60da1b implementation()", "0x5c975abb paused()", "0x6abf7081 (unnamed)", "0x8456cb59 pause()",
+      "0x91d14854 hasRole(bytes32,address)", "0xa217fddf DEFAULT_ADMIN_ROLE()", "0xd547741f grantRole? (renamed role)",
+      "0xfaed47fd (unnamed)", "0xfbac3951 isBlocked(address)"
+    ],
+    "finding": "the beacon is an AccessControl-holding upgrade beacon that ALSO carries the global pause and the per-address blocklist — the revocation beat upgrades beacon.implementation() under a fixed proxy address, exactly the demo mechanic (spec.md:54)"
+  },
+  "proxy": {
+    "code_len": 283,
+    "p_codehash_evidence": "0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630",
+    "p_codehash_live":    "0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630",
+    "crm_codehash_evidence": "0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630",
+    "identical_bytecode": true,
+    "structure": "embedded fixed beacon address 0xe10b6f…1b00 + STATICCALL implementation() (0x5c60da1b) + DELEGATECALL to the result; NO sstore — the proxy itself never writes the EIP-1967 slots (the beacon slot is written by deployment tooling)",
+    "solc": "0.8.3x (metadata footer)"
+  },
+  "impl": {
+    "address": "0xb35490d6f9163de4f80d88dc75c3516eb64c5ae2",
+    "code_len": 11614,
+    "codehash_evidence": "0xdc07e86ee482f99641bdafb9a0d772846b167401e094d90a666b94dbdcd1eec7",
+    "codehash_live":    "0xdc07e86ee482f99641bdafb9a0d772846b167401e094d90a666b94dbdcd1eec7",
+    "note": "saved shared_impl.hex IS the current live implementation — one shared impl across tokens"
+  },
+  "fingerprint_selectors": {
+    "paused":       "0x5c975abb",
+    "blocklist":    "0xfbac3951",
+    "target_for_blocklist": "the BEACON (0xfbac3951 reverts on the impl/proxy — live-verified, empty revert data)",
+    "target_for_paused": "the token proxy itself (answered live)",
+    "others_confirmed_in_impl_dispatcher": {
+      "uid()": "0xf514ce36", "uiMultiplier()": "0xa60bf13d", "pause()": "0x8456cb59", "unpause()": "0x3f4ba83a",
+      "name()": "0x06fdde03", "symbol()": "0x95d89b41", "decimals()": "0x313ce567", "totalSupply()": "0x18160ddd",
+      "balanceOf(address)": "0x70a08231", "transfer(address,uint256)": "0xa9059cbb",
+      "transferFrom(address,address,uint256)": "0x23b872dd", "approve(address,uint256)": "0x095ea7b3",
+      "allowance(address,address)": "0xdd62ed3e", "nonces(address)": "0x7ecebe00", "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": "0xd505accf",
+      "supportsInterface(bytes4)": "0x01ffc9a7", "mint(address,uint256)": "0x40c10f19"
+    }
+  },
+  "live_calls_on_P": {
+    "paused()": "0x000…000 (false)",
+    "uiMultiplier()": "0x000…0de0b6b3a7640000 (1e18)",
+    "uid()": "0x0000000000000000000000000000000002c4d1ce31ec4310b2c507c921a52b70",
+    "symbol()": "\"P\"",
+    "isBlocked(0xd8dA…6045) via proxy": "REVERTED (empty data) — matches beacon-state finding",
+    "uid_cross_link": "uid() on-chain == /rhj/assets registry id for P (rhj_assets_sample.json) — canonical registry row ↔ on-chain token proof, byte-exact"
+  },
+  "goplus_check": {
+    "endpoint_used": "GET https://api.gopluslabs.io/api/v1/token_security/4663?contract_addresses=0x1Cdad396DB64BDa184d5182A97Dd9B3C62100b7D (underscore form)",
+    "result": "code 1 OK, 16 fields, is_proxy=1, is_open_source=1; EVERY risk field absent (no is_honeypot / transfer_pausable / is_blacklisted / hidden_owner / slippage_modifiable)",
+    "implication": "GoPlus cannot flag this chain's beacon pattern — demo copy stays on enforcement+revocation+power-disclosure, never 'first correct coverage' claims about GoPlus gaps",
+    "impostor_half": "no impostor address is recorded in any evidence file — unanswerable at spike time (verify.md loose end 7, recorded)"
+  },
+  "eas_check": {
+    "eas_421614": "0x2521021fc8BF070473E1e1801D3c7B4aB701E1dE",
+    "schema_registry": "0x45CB6Fa0870a8Af06796Ac15915619a0f22cd475",
+    "live_staticcalls": { "version()": "\"1.3.0\"", "getSchemaRegistry()": "0x45cb6fa0870a8af06796ac15915619a0f22cd475" },
+    "evidence_files": ["eas_arbitrum_sepolia.json (canonical eas-contracts deployments JSON)"],
+    "verdict": "EAS available on 421614, NOT deployed on 4663 (repo has no 4663 folder) — bespoke registry stands"
+  },
+  "stylus_gate": {
+    "command": "cargo stylus check --endpoint https://rpc.mainnet.chain.robinhood.com",
+    "exit_code": 0,
+    "contract_size": "12.4 KB (12429 bytes)",
+    "wasm_data_fee_quoted_on_chain": "0.000092 ETH (originally 0.000076 ETH with 20% bump) — the tool computed the ArbWasm (0x…0071) fee from the LIVE chain, proving activation",
+    "control_421614": "same command vs https://sepolia-rollup.arbitrum.io/rpc — exit 0",
+    "project_metadata_hash": "3ab96a63df7a2850d1d7be691e6dd15a8fb0194183dcb2cd99c61aba8f850359",
+    "evidence_file": "stylus_check_4663_421614.log"
+  },
+  "reproduction_commands": [
+    "cast storage 0x1Cdad396DB64BDa184d5182A97Dd9B3C62100b7D 0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50 --rpc-url https://rpc.mainnet.chain.robinhood.com",
+    "cast call 0xe10b6f6b275de231345c20d14ab812db62151b00 'implementation()' --rpc-url https://rpc.mainnet.chain.robinhood.com",
+    "cast call 0x1Cdad396DB64BDa184d5182A97Dd9B3C62100b7D 'uid()' --rpc-url https://rpc.mainnet.chain.robinhood.com",
+    "cast code 0xb35490d6f9163de4f80d88dc75c3516eb64c5ae2 --rpc-url https://rpc.mainnet.chain.robinhood.com | keccak256 == 0xdc07e86e…eec7"
+  ]
+}

@@ -1,0 +1,32 @@
+Funding attempts — headless probes, 2026-09-19 (gate day 7+1; prior run blocked 2026-09-1x)
+==========================================================================================
+All faucets that could reach Arbitrum Sepolia (421614) / Robinhood testnet (46630)
+were probed from this box without a browser or login. Results:
+
+1. faucet.arbitrum.io (official)        → connection failed, HTTP 000  (DEAD; same as
+                                          knowledge arbitrum-sepolia.md:18, re-checked today)
+2. faucet.quicknode.com/arbitrum/sepolia → "Failed to verify your browser — Vercel
+   (the 46630 attempt of the prior run)    Security Checkpoint" — evidence PNGs:
+                                          faucet_46630_checkpoint.png / _state.png
+3. sepolia-faucet.pk910.de (PoW)        → POST /api/startSession returns
+                                          {"status":"failed","failedCode":"INVALID_CAPTCHA",
+                                          "failedReason":"captcha check failed: captcha token missing"}
+                                          AND the config banner says "Sorry, the faucet is out of funds :("
+4. www.alchemy.com/faucets/arbitrum-sepolia, faucets.chain.link/…, infura.io/faucet/sepolia
+                                          → require account login and/or an existing
+                                            mainnet balance (knowledge arbitrum-sepolia.md:23-24)
+5. faucet.triangleplatform.com           → HTTP 503
+6. hub.conduit.xyz/sepolia-faucet        → HTTP 404
+7. l2faucet.com / arbitrum.faucet.dev    → JS apps, no dispensing API discoverable headlessly
+8. Local key material                    → ~/.coin-tools/.keys address
+   0xE663ec42137bf4e8DeC9C6a3C36A465eE121835f: balance 0 on 421614, 4663, 46630;
+   the prior run's local-deploy address 0xbcb22d7a3ffcccbf001a047d085bff8a0315b3a5:
+   balance 0 on all three chains (broadcast at block 2 = local anvil, not a public chain)
+
+CONCLUSION: no chain can be funded headlessly from this environment. Gas receipts
+(the ≤200,000 half of the spec gate) need ONE operator action — see ../DEPLOY.md.
+
+What does NOT depend on funding (all done):
+- cargo stylus check on 4663 → exit 0, ArbWasm fee quoted from the live chain (activation PROVEN)
+- full pattern calibration via read-only RPC (calibration_4663.json)
+- canonical fetch, GoPlus, EAS, replica mechanics (local receipts)
