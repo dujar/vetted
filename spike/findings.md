@@ -1,0 +1,35 @@
+GATE: PASS-PENDING-GAS — Stylus on 4663 is REAL: cargo stylus check against the live mainnet RPC exited 0 and ArbWasm (0x…0071) quoted the on-chain wasm data fee (0.000092 ETH) — activation is proven; the FAIL criterion ("Stylus not activated") is eliminated. The remaining PASS condition (≤200,000 gas receipts, spec.md:51) is blocked ONLY on testnet funding: every faucet is headless-blocked (evidence/funding_blockers_20260919.txt). One operator action finishes it in ~15 min via spike/DEPLOY.md.
+
+# Step 2 — week-1 spike gate (day 7, slipped to 09-19 after the prior builder's usage-limit death)
+
+status:     ready-to-merge (workbench-complete; gate receipts pending DEPLOY.md)
+branch:     step-2-spike-gate
+deployed:   not deployed (no funded key — see funding blockers); replica beat proven on a local chain (block-2 receipts); stylus check proven against live 4663 + 421614
+
+## What was built
+
+The gate minus one funding action. (1) **Probe contract** `spike/probe/` (Rust/Stylus, sdk 0.10.9): staticcall probes (`probePaused`, `probeBlocklist`), remote code reads (`probeCode`, `codeBytes`), EIP-1967 resolution (`readBeaconSlot`, `resolveImpl`, composed `probeResolve`), the seven-field record stub + `readRecord` (verify loose end 3), and `runSuite` — the whole suite in ONE tx so a single receipt gasUsed is the spec number. All probes are infallible views returning ok-flags (empty-code mirror reads "ok, nothing there" — loose end 2). 9 native TestVM tests, all green. `cargo stylus check` exit 0 on BOTH `rpc.mainnet.chain.robinhood.com` and 421614; ABI exported (10 fns, camelCase); deployment metadata hash 3ab96a63…0359. (2) **Pattern calibration** (task 5) — complete, byte-exact, LIVE-verified via read-only RPC, `evidence/calibration_4663.json`: proxies of P and CRM are byte-identical 283-byte forwarders (codehash 0x6c1fdd40…5630) embedding ONE shared beacon 0xe10b6f…1b00; beacon slot 0xa3f0…3d50 set on BOTH tokens (impl slot empty); beacon.implementation() → 0xb35490d6…c5ae2 whose codehash matches the saved shared_impl evidence (0xdc07e86e…eec7); uid() on-chain == the /rhj/assets registry id for P, byte-exact. (3) Replica smoke (task 6): 10 local receipts incl. the beacon-upgrade beat under a fixed proxy + pause + blocklist + the 0x5c canary pattern (broadcast/, chain 412346 = local). (4) Canonical fetch (task 7): worker built + 194-row live sample, P/CRM rows carry contractAddress + chainId 4663. (5) GoPlus (task 9): saved 16-field response — is_proxy=1, every risk field absent; impostor half unanswerable (no impostor address exists in any evidence — loose end 7). (6) EAS (task 8): canonical deployments JSON + live staticcalls (version() = "1.3.0", SchemaRegistry matches) — on 421614 only, absent on 4663. (7) Funding attempts (task 1) exhausted headlessly with evidence; `DEPLOY.md` is the finish-the-gate runbook.
+
+## Where the plan was wrong
+
+- **Blocklist state lives on the BEACON, not the token.** `isBlocked(address)` (0xfbac3951) reverts on the impl/proxy and answers on the beacon (live-tested). The plan's "pause + per-address-blocklist probe selectors" assumed token-level probes; the guard's live-probe half (step 3) and the scanner (step 4) must resolve the beacon FIRST and probe the beacon for blocklist, the proxy for paused.
+- **Criterion (c) "reads the EIP-1967 implementation slot" is impossible from-contract on stock EVMs** — EIP-2330's EXTSLOAD (0x5c) is unshipped and Stylus has no remote-storage hostio. The probe keeps an extsload-helper call interface for chains that ever ship 0x5c; the canary (`DeployCanary.s.sol`) decides per-chain at deploy. Node-side eth_getStorageAt DOES read the slots (proven live) — which is exactly how step 4's worker does slot resolution anyway ("Backend: RPC reads"). If the canary comes back ABSENT on 4663, the spec's from-contract wording needs a one-line amendment; it is NOT a Stylus gap (Solidity is equally blocked).
+- **The proxies don't use the impl slot**: beacon slot only. The 46630 faucet was Vercel-checkpoint-blocked, not merely login-gated (PNGs). faucet.arbitrum.io is still dead (000, re-checked 09-19); pk910 PoW is captcha-gated AND out of funds.
+- TestVM 0.10.9 quirk found: `static_call_contract` writes only the returndata LENGTH; mock BYTES come from the last-registered mock (`state.return_data`) — contract code is correct, native tests for multi-staticcall flows must be split per call (see probe test comments).
+
+## What the next step needs to know
+
+- **Steps 3/4/6 may build on Stylus.** Activation risk is gone; only the gas budget is unmeasured — expect far under 200k (the suite is 4 storage reads + 3 staticcalls + 2 code hostios; Stylus hostios are cheap), but do not cite a number until DEPLOY.md's receipt exists.
+- **Calibrated PROBE_SELECTORS (merge-time edit, NOT yet applied):** `paused: "0x5c975abb"`, `blocklist: "0xfbac3951"` — plus targets: paused → token proxy, blocklist → resolved beacon. The `abi.ts` test only checks the 0x…{8} format, so the replacement is suite-safe (verify.md:14).
+- **Fingerprint for the scanner's depth boundary (step 4):** codehash(proxy) == 0x6c1fdd40…; beacon slot set + impl slot empty; beacon codehash 0x8b465c0b…; impl codehash 0xdc07e86e…; on-chain uid() == registry id (the strongest single check). Selector set + solc 0.8.3x in calibration_4663.json.
+- **Step 6's replica must mirror the GENUINE layout**: AccessControl beacon carrying paused + isBlocked + implementation()/upgradeTo, proxy = slotless embedded-beacon forwarder. The current spike replica puts pause/blocklist in the token and uses an OZ-style proxy — its beacon does NOT answer isBlocked, so the probe suite returns blocklist_ok=false against it (expected; loose end 2's mirror semantics).
+- **Spike key**: 0x151e9f57F31310aFeBBB60c222c14badCf938E4C (key in gitignored `spike/.env`). Fund it or substitute the registrar wallet; DEPLOY.md has every command including the exact `cast send runSuite` receipt capture.
+- crates.io stylus-sdk/cargo-stylus pinned 0.10.9; toolchain script fixed on main (1b76d63).
+
+## Out of scope, left broken
+
+- Gas receipts + on-chain probe/receipt evidence: BLOCKED on funding (unblock list: evidence/funding_blockers_20260919.txt; actions: DEPLOY.md §0).
+- PROBE_SELECTORS in packages/shared/abi.ts still placeholders — deliberate: merge-time-only edit, applied when this branch merges.
+- `spike/probe/target/x86_64-unknown-linux-gnu/` is root-owned (prior run's sudo build), unremovable without sudo — harmless, gitignored; export-abi needs `CARGO_TARGET_DIR=/tmp/probe-host` until cleaned.
+- Openchain signature-DB lookup 500'd, so a handful of impl dispatcher selectors remain unnamed in calibration_4663.json (0x7706ba52, 0xd5025625, 0xdc767007, …) — none is load-bearing; the calibrated pair is keccak-verified.
+- The known impostor on 4663 has no recorded address anywhere — GoPlus re-run covers the genuine token only (verify loose end 7; a live impostor would need to be minted to test the scanner, which is step 4's job with its own test token).
