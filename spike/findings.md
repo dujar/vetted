@@ -5,6 +5,7 @@ GATE: PASS-PENDING-GAS — Stylus on 4663 is REAL: cargo stylus check against th
 status:     merged (review round 1 blocking fix landed; GATE stays PASS-PENDING-GAS until the operator run — spike/DEPLOY.md)
 branch:     step-2-spike-gate
 deployed:   worker https://vetted-spike-canonical-fetch.dujar-coding.workers.dev (GET /assets → {"ok":true,"total":194,calibration P/CRM @4663}; /health → {"ok":true}) — everything else on-chain pending funding (see DEPLOY.md); replica beat proven on a local chain (block-2 receipts); stylus check proven against live 4663 + 421614
+reconciled: 2026-09-19 (folded into plans 3–10; judge round 3: SHIPPABLE — .agent-workbench/reconciliation/2026-09-19-steps-2-and-5-findings.md; this file lives in the repo because step-2's scope put it here — the coordinator accepts that record as the authoritative stamp copy)
 
 ## What was built
 
