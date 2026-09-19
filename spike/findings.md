@@ -2,7 +2,7 @@ GATE: PASS-PENDING-GAS — Stylus on 4663 is REAL: cargo stylus check against th
 
 # Step 2 — week-1 spike gate (day 7, slipped to 09-19 after the prior builder's usage-limit death)
 
-status:     ready-to-merge (workbench-complete; gate receipts pending DEPLOY.md)
+status:     merged (review round 1 blocking fix landed; GATE stays PASS-PENDING-GAS until the operator run — spike/DEPLOY.md)
 branch:     step-2-spike-gate
 deployed:   worker https://vetted-spike-canonical-fetch.dujar-coding.workers.dev (GET /assets → {"ok":true,"total":194,calibration P/CRM @4663}; /health → {"ok":true}) — everything else on-chain pending funding (see DEPLOY.md); replica beat proven on a local chain (block-2 receipts); stylus check proven against live 4663 + 421614
 
