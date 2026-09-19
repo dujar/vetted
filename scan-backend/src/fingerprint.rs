@@ -20,6 +20,7 @@ use crate::hexutil::{
     decode_abi_bool, decode_hex, encode_hex, norm_addr, selectors, word_to_addr,
 };
 use crate::rpc::{CallResult, RpcClient, Transport};
+use crate::rules::Probes;
 
 /// What the resolution pass established about one contract.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -177,25 +178,42 @@ pub async fn answers_implementation<T: Transport>(rpc: &RpcClient<T>, addr: &str
     )
 }
 
-/// Probes at the calibrated targets (S4/S5). Returns the answered flags.
+/// Probes at the calibrated targets (S4/S5). `None` = a probe read FAILED
+/// (rate limit, transport error) or there was no beacon to probe — no
+/// evidence at all, so the report must claim no probe row: an unanswered
+/// probe is never rendered as ABSENT (spec.md:30 evidence rule; the live
+/// check caught the collapse of "read failed" into "absent"). A `false`
+/// field is only ever a definitive revert.
 pub async fn probe<T: Transport>(
     rpc: &RpcClient<T>,
     proxy: &str,
     beacon: Option<&str>,
     buyer: &str,
-) -> (bool, bool) {
+) -> Option<Probes> {
     // S4: paused() → the token PROXY.
-    let paused = matches!(
-        rpc.call(proxy, selectors::PAUSED).await,
-        Ok(CallResult::Ok(hex)) if decode_abi_bool(&hex) == Some(false) || decode_abi_bool(&hex) == Some(true)
-    );
+    let paused = match rpc.call(proxy, selectors::PAUSED).await {
+        Ok(CallResult::Ok(hex)) => match decode_abi_bool(&hex) {
+            Some(v) => v,
+            None => return None, // answered, but not a decodable bool — no clean evidence
+        },
+        Ok(CallResult::Reverted(_)) => false, // definitive negative: no pause mechanism
+        Err(_) => return None,                // read failed — never claim ABSENT
+    };
     // S5: isBlocked(buyer) → the resolved BEACON (reverts on proxy/impl).
     let blocklist = match beacon {
-        Some(b) => matches!(rpc.call(b, &crate::hexutil::call_addr(selectors::BLOCKLIST, buyer)).await,
-            Ok(CallResult::Ok(_))),
-        None => false,
+        Some(b) => {
+            match rpc
+                .call(b, &crate::hexutil::call_addr(selectors::BLOCKLIST, buyer))
+                .await
+            {
+                Ok(CallResult::Ok(_)) => true,        // answered: the mechanism exists
+                Ok(CallResult::Reverted(_)) => false, // definitive negative
+                Err(_) => return None,                // read failed — never claim ABSENT
+            }
+        }
+        None => return None, // no beacon → no calibrated target to probe
     };
-    (paused, blocklist)
+    Some(Probes { paused, blocklist })
 }
 
 /// Finalize S4/S5 into the layout's signature flag.
@@ -274,5 +292,53 @@ mod tests {
         // Unanswered probes fail (S4/S5) — a twin that merely embeds a beacon.
         assert!(!signature_match(&full, true, false));
         assert!(!signature_match(&full, false, true));
+    }
+
+    #[tokio::test]
+    async fn failed_probe_read_is_no_evidence_not_absent() {
+        struct RateLimited;
+        impl crate::rpc::Transport for RateLimited {
+            async fn post(&self, _url: &str, _body: String) -> Result<String, String> {
+                Err("429 too many requests".into())
+            }
+        }
+        let client: RpcClient<RateLimited> = RpcClient::new("http://test", RateLimited);
+        // The live failure that shipped: a rate-limited probe read must NOT
+        // become ABSENT evidence — it yields None (no rows, no signature
+        // match), per the spec.md:30 evidence rule.
+        assert!(probe(&client, "0xabc", Some("0xbeaf"), "0x42").await.is_none());
+    }
+
+    #[tokio::test]
+    async fn reverted_probe_is_a_definitive_negative() {
+        struct Reverting;
+        impl crate::rpc::Transport for Reverting {
+            async fn post(&self, _url: &str, _body: String) -> Result<String, String> {
+                Ok(r#"{"jsonrpc":"2.0","id":1,"error":{"code":3,"message":"execution reverted"}}"#.into())
+            }
+        }
+        let client: RpcClient<Reverting> = RpcClient::new("http://test", Reverting);
+        // A revert from the calibrated target is EVIDENCE (the mechanism is
+        // absent) — distinct from a failed read.
+        let probes = probe(&client, "0xabc", Some("0xbeaf"), "0x42").await.unwrap();
+        assert_eq!(probes, Probes { paused: false, blocklist: false });
+    }
+
+    #[tokio::test]
+    async fn answered_probes_carry_the_mechanism() {
+        struct Answering;
+        impl crate::rpc::Transport for Answering {
+            async fn post(&self, _url: &str, _body: String) -> Result<String, String> {
+                Ok(serde_json::json!({
+                    "jsonrpc": "2.0", "id": 1,
+                    "result": "0x0000000000000000000000000000000000000000000000000000000000000001"
+                })
+                .to_string())
+            }
+        }
+        let client: RpcClient<Answering> = RpcClient::new("http://test", Answering);
+        // Both selectors answer: pause is ON, blocklist mechanism PRESENT.
+        let probes = probe(&client, "0xabc", Some("0xbeaf"), "0x42").await.unwrap();
+        assert_eq!(probes, Probes { paused: true, blocklist: true });
     }
 }
