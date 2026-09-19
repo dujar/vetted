@@ -1,0 +1,29 @@
+[package]
+name = "registry"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+stylus-sdk = "0.10.9"
+# sol! event/error declarations expand to absolute `alloy_sol_types::` paths —
+# the crate must be a direct dependency (same version floor as stylus-sdk).
+alloy-sol-types = { version = "1.5.7", default-features = false }
+
+[dev-dependencies]
+# Enables stylus_sdk::testing (native TestVM) for unit tests only; the feature
+# does not reach the wasm build (resolver 2 keeps dev-dep features separate).
+stylus-sdk = { version = "0.10.9", features = ["stylus-test"] }
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+
+# cargo stylus export-abi runs this bin (with the feature) to print the
+# Solidity interface — "a bin target must be available for cargo run".
+[[bin]]
+name = "export-abi"
+path = "src/bin/export_abi.rs"
+required-features = ["export-abi"]

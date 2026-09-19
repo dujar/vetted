@@ -3,6 +3,10 @@ resolver = "2"
 # Contract crates live under core/ (replicas/ is step 6's own foundry project,
 # not a member). Drop a new crate in and the glob picks it up.
 members = ["core/*"]
+# core/mock-token is step 3's foundry (Solidity) project — the mock pattern
+# tokens must BE genuine-shape EVM bytecode (patched forwarder), so they are
+# not a cargo crate (plan Revised note 4).
+exclude = ["core/mock-token"]
 
 [profile.release]
 # Standard Stylus release profile (size matters on-chain: 96 KB runtime cap).

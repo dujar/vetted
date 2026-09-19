@@ -1,0 +1,9 @@
+# Scoped override (contracts tree only — repo root keeps the floating
+# "stable"; scan-backend is a sibling and unaffected): cargo stylus requires
+# a PINNED toolchain — generic "stable" is rejected ("must be a specific
+# version"). The spike proved this exact override shape (spike/probe/
+# rust-toolchain.toml); 1.97.1 is the version the repo root's "stable"
+# resolves to on the dev box and in CI (step-1 verified).
+[toolchain]
+channel = "1.97.1"
+targets = ["wasm32-unknown-unknown"]

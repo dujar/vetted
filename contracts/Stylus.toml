@@ -1,0 +1,6 @@
+# Workspace manifest for cargo-stylus (cargo-workspace support, sdk 0.10.0):
+# parsed at the WORKSPACE ROOT; each member crate must exist and compile.
+# A (possibly empty) networks table is REQUIRED — "missing field workspace"
+# otherwise (spike findings). [wasm-opt] pinning goes here if reproducible
+# builds ever need it.
+[workspace.networks]
