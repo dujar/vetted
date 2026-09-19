@@ -1,0 +1,7 @@
+# Scoped override: cargo stylus requires a PINNED toolchain (generic
+# "stable" is rejected). The repo root pins "stable" (1.97.1 on this box —
+# step-1 verified); this file pins the same version for the spike crate only.
+# Step 3 must either pin the root file to 1.97.1 or copy this override.
+[toolchain]
+channel = "1.97.1"
+targets = ["wasm32-unknown-unknown"]

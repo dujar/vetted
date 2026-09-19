@@ -1,0 +1,384 @@
+=== stylus check 4663 (mainnet.chain.robinhood.com) ===
+2026-09-18T23:13:00.860Z INFO  [stylus_tools::core::build] [0;0m[90mBuilding project with Cargo.toml version: 0.1.0[0;0m
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling typenum v1.20.1
+   Compiling version_check v0.9.5
+   Compiling paste v1.0.15
+   Compiling cfg-if v1.0.4
+   Compiling unicode-segmentation v1.13.3
+   Compiling heck v0.5.0
+   Compiling unicode-xid v0.2.6
+   Compiling cpufeatures v0.2.17
+   Compiling serde_core v1.0.229
+   Compiling ruint-macro v1.2.1
+   Compiling dunce v1.0.5
+   Compiling equivalent v1.0.2
+   Compiling hashbrown v0.17.1
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling semver v1.0.28
+   Compiling zmij v1.0.23
+   Compiling const-hex v1.19.1
+   Compiling keccak v0.2.2
+   Compiling syn v1.0.109
+   Compiling serde v1.0.229
+   Compiling target-tuple v1.0.2
+   Compiling serde_json v1.0.151
+   Compiling bytes v1.12.1
+   Compiling regex-syntax v0.8.11
+   Compiling winnow v1.0.4
+   Compiling utf8parse v0.2.2
+   Compiling rustc_version v0.4.1
+   Compiling anstyle-parse v1.0.0
+   Compiling generic-array v0.14.9
+   Compiling proc-macro-error-attr v1.0.4
+   Compiling ruint v1.16.0
+   Compiling convert_case v0.10.0
+   Compiling proc-macro-error v1.0.4
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling branches v0.4.6
+   Compiling anstyle-query v1.1.5
+   Compiling indexmap v2.14.2
+   Compiling aho-corasick v1.1.5
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling anstyle v1.0.14
+   Compiling colorchoice v1.0.5
+   Compiling termcolor v1.4.1
+   Compiling lazy_static v1.5.0
+   Compiling clap_lex v1.1.0
+   Compiling glob v0.3.4
+   Compiling keccak v0.1.6
+   Compiling dyn-clone v1.0.20
+   Compiling strsim v0.11.1
+   Compiling convert_case v0.6.0
+   Compiling rclite v0.4.1
+   Compiling hybrid-array v0.4.15
+   Compiling syn v2.0.119
+   Compiling syn v3.0.5
+   Compiling anstream v1.0.0
+   Compiling mini-alloc v1.0.0
+   Compiling proc-macro-error-attr3 v3.0.1
+   Compiling keccak-const v0.2.0
+   Compiling hex v0.4.3
+   Compiling clap_builder v4.6.6
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.6
+   Compiling digest v0.10.7
+   Compiling sha3 v0.10.9
+   Compiling digest v0.11.3
+   Compiling sha3 v0.11.0
+   Compiling regex-automata v0.4.18
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling derivative v2.2.0
+   Compiling serde_derive v1.0.229
+   Compiling clap_derive v4.6.4
+   Compiling macro-string v0.2.0
+   Compiling syn-solidity v1.7.3
+   Compiling proc-macro-error3 v3.0.1
+   Compiling regex v1.13.1
+   Compiling derive_more-impl v2.1.1
+   Compiling clap v4.6.6
+   Compiling trybuild v1.0.121
+   Compiling alloy-sol-macro-input v1.7.3
+   Compiling alloy-sol-macro-expander v1.7.3
+   Compiling derive_more v2.1.1
+   Compiling alloy-primitives v1.7.3
+   Compiling alloy-sol-macro v1.7.3
+   Compiling alloy-sol-types v1.7.3
+   Compiling stylus-core v0.10.9
+   Compiling stylus-proc v0.10.9
+   Compiling stylus-sdk v0.10.9
+   Compiling probe v0.1.0 (/home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe)
+warning: unexpected `cfg` condition value: `contract-client-gen`
+  --> src/lib.rs:70:5
+   |
+70 |     #[entrypoint]
+   |     ^^^^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `export-abi`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `entrypoint` crate for guidance on how handle this unexpected cfg
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: `#[warn(unexpected_cfgs)]` on by default
+   = note: this warning originates in the attribute macro `entrypoint` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+  --> src/lib.rs:69:1
+   |
+69 | / sol_storage! {
+70 | |     #[entrypoint]
+71 | |     pub struct Probe {
+...  |
+88 | | }
+   | |_^
+   |
+   = note: expected values for `feature` are: `export-abi`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `stylus_sdk::stylus_proc::storage` crate for guidance on how handle this unexpected cfg
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the attribute macro `stylus_sdk::stylus_proc::storage` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+  --> src/lib.rs:90:1
+   |
+90 | #[public]
+   | ^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `export-abi`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `public` crate for guidance on how handle this unexpected cfg
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the attribute macro `public` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:114:12
+    |
+114 |     pub fn read_record(&self) -> (u8, U256, u64, Address, Address, u64, B256) {
+    |            ^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:131:12
+    |
+131 |     pub fn probe_paused(&self, token: Address) -> (bool, bool) {
+    |            ^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:138:12
+    |
+138 |     pub fn probe_code(&self, a: Address) -> (U256, B256) {
+    |            ^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:145:12
+    |
+145 |     pub fn code_bytes(&self, a: Address, offset: U256, len: U256) -> Vec<u8> {
+    |            ^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:158:12
+    |
+158 |     pub fn read_beacon_slot(&self, proxy: Address, extsload: Address) -> (Address, bool) {
+    |            ^^^^^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:164:12
+    |
+164 |     pub fn resolve_impl(&self, beacon: Address) -> (Address, bool) {
+    |            ^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:171:12
+    |
+171 |     pub fn probe_resolve(
+    |            ^^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:186:12
+    |
+186 |     pub fn probe_blocklist(&self, beacon: Address, buyer: Address) -> (bool, bool) {
+    |            ^^^^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:198:12
+    |
+198 |     pub fn run_suite(
+    |            ^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: `probe` (lib) generated 13 warnings (1 duplicate)
+    Finished `release` profile [optimized] target(s) in 14.82s
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/Cargo.lock[0;0m
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/Cargo.toml[0;0m
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/rust-toolchain.toml[0;0m
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/src/lib.rs[0;0m
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/src/main.rs[0;0m
+[0;0m[90mproject metadata hash computed on deployment: "3ab96a63df7a2850d1d7be691e6dd15a8fb0194183dcb2cd99c61aba8f850359"[0;0m
+2026-09-18T23:13:16.069Z INFO  [stylus_tools::core::check] [0;0m[90mcontract size: [38;5;48;1m12.4 KB[0;0m[90m (12429 bytes)[0;0m
+2026-09-18T23:13:17.182Z INFO  [stylus_tools::core::activation] [0;0m[90mwasm data fee: [38;5;48;1m0.000092 ETH[0;0m [0;0m[90m(originally [38;5;48;1m0.000076 ETH[0;0m[0;0m[90m with [38;5;183;1m20%[0;0m[90m bump)[0;0m
+EXIT_4663=0
+=== stylus check 421614 (sepolia-rollup.arbitrum.io/rpc) ===
+2026-09-18T23:13:17.247Z INFO  [stylus_tools::core::build] [0;0m[90mBuilding project with Cargo.toml version: 0.1.0[0;0m
+warning: unexpected `cfg` condition value: `contract-client-gen`
+  --> src/lib.rs:70:5
+   |
+70 |     #[entrypoint]
+   |     ^^^^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `export-abi`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `entrypoint` crate for guidance on how handle this unexpected cfg
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: `#[warn(unexpected_cfgs)]` on by default
+   = note: this warning originates in the attribute macro `entrypoint` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+  --> src/lib.rs:69:1
+   |
+69 | / sol_storage! {
+70 | |     #[entrypoint]
+71 | |     pub struct Probe {
+...  |
+88 | | }
+   | |_^
+   |
+   = note: expected values for `feature` are: `export-abi`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `stylus_sdk::stylus_proc::storage` crate for guidance on how handle this unexpected cfg
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the attribute macro `stylus_sdk::stylus_proc::storage` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+  --> src/lib.rs:90:1
+   |
+90 | #[public]
+   | ^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `export-abi`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `public` crate for guidance on how handle this unexpected cfg
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the attribute macro `public` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:114:12
+    |
+114 |     pub fn read_record(&self) -> (u8, U256, u64, Address, Address, u64, B256) {
+    |            ^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:131:12
+    |
+131 |     pub fn probe_paused(&self, token: Address) -> (bool, bool) {
+    |            ^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:138:12
+    |
+138 |     pub fn probe_code(&self, a: Address) -> (U256, B256) {
+    |            ^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:145:12
+    |
+145 |     pub fn code_bytes(&self, a: Address, offset: U256, len: U256) -> Vec<u8> {
+    |            ^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:158:12
+    |
+158 |     pub fn read_beacon_slot(&self, proxy: Address, extsload: Address) -> (Address, bool) {
+    |            ^^^^^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:164:12
+    |
+164 |     pub fn resolve_impl(&self, beacon: Address) -> (Address, bool) {
+    |            ^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:171:12
+    |
+171 |     pub fn probe_resolve(
+    |            ^^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:186:12
+    |
+186 |     pub fn probe_blocklist(&self, beacon: Address, buyer: Address) -> (bool, bool) {
+    |            ^^^^^^^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unexpected `cfg` condition value: `contract-client-gen`
+   --> src/lib.rs:198:12
+    |
+198 |     pub fn run_suite(
+    |            ^^^^^^^^^
+    |
+    = note: expected values for `feature` are: `export-abi`
+    = help: consider adding `contract-client-gen` as a feature in `Cargo.toml`
+    = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: `probe` (lib) generated 13 warnings (1 duplicate)
+    Finished `release` profile [optimized] target(s) in 0.19s
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/Cargo.lock[0;0m
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/Cargo.toml[0;0m
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/rust-toolchain.toml[0;0m
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/src/lib.rs[0;0m
+[0;0m[90mFile used for deployment hash: /home/bitslicer/projects/hackathon_arbitrum_singpapore/spike/probe/src/main.rs[0;0m
+[0;0m[90mproject metadata hash computed on deployment: "3ab96a63df7a2850d1d7be691e6dd15a8fb0194183dcb2cd99c61aba8f850359"[0;0m
+2026-09-18T23:13:17.783Z INFO  [stylus_tools::core::check] [0;0m[90mcontract size: [38;5;48;1m12.4 KB[0;0m[90m (12429 bytes)[0;0m
+2026-09-18T23:13:18.920Z INFO  [stylus_tools::core::activation] [0;0m[90mwasm data fee: [38;5;48;1m0.000092 ETH[0;0m [0;0m[90m(originally [38;5;48;1m0.000076 ETH[0;0m[0;0m[90m with [38;5;183;1m20%[0;0m[90m bump)[0;0m
+EXIT_421614=0

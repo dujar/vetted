@@ -1,0 +1,16 @@
+[package]
+name = "spike-canonical-fetch"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+worker = "0.8.5"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Same shape as scan-backend: pure summarizer fn is unit-testable on the
+# native target; the #[event(fetch)] handler is a thin wrapper.

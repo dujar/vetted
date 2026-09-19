@@ -46,15 +46,18 @@ export const GUARD_REVERT_REASONS = [
 ] as const;
 
 // ============================================================================
-// PROBE_SELECTORS — RESERVED BLOCK (step 2 replaces at merge)
+// PROBE_SELECTORS — CALIBRATED (step 2 merge-time edit, review round 1)
 // ----------------------------------------------------------------------------
-// Placeholder bytes until the week-1 spike calibrates the real probe selectors
-// (paused() + the per-address buyer-blocklist probe) on live 4663 tokens
-// (step-2 plan task 5, merge-time append). Consumers read the exported
-// constant — never hardcode the placeholder value — so step 2's replacement
-// propagates everywhere at once.
+// Byte-exact from the live genuine stock tokens on 4663 (spike/findings.md,
+// spike/evidence/calibration_4663.json; keccak-verified + independently
+// reproduced by review):
+//   paused()           = keccak("paused()")[0..4]            → probed on the token PROXY
+//   isBlocked(address) = keccak("isBlocked(address)")[0..4]  → probed on the resolved BEACON
+//                        (the blocklist state lives on the beacon; the same
+//                        selector reverts on the impl/proxy — live-verified)
+// Consumers read the exported constant — never hardcode the value.
 // ============================================================================
 export const PROBE_SELECTORS = {
-  paused: "0x00000000",
-  blocklist: "0x00000000",
+  paused: "0x5c975abb",
+  blocklist: "0xfbac3951",
 } as const;

@@ -1,0 +1,6 @@
+# stylus-tools 0.10.9 parses Stylus.toml at the workspace root as a
+# WorkspaceManifest: [workspace] with a (possibly empty) networks table is
+# REQUIRED — a comment-only file fails `cargo stylus check` with
+# "missing field `workspace`" (spike findings.md). [wasm-opt] pinning goes
+# here if reproducible builds ever need it.
+[workspace.networks]
