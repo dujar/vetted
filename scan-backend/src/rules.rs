@@ -39,8 +39,10 @@ pub struct Structure {
 }
 
 /// Probe outcomes at the calibrated targets. `true` = the selector ANSWERED
-/// (the mechanism exists on-chain); `false` = it reverted (mechanism absent).
-/// `probes: None` = probes not run (degraded/terminal scenarios).
+/// (the mechanism exists on-chain); `false` = it definitively reverted
+/// (mechanism absent). `probes: None` = probes not run OR a probe read
+/// failed (rate limit/transport) — no probe rows are claimed at all: an
+/// unanswered probe is never rendered as ABSENT (spec.md:30 evidence rule).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Probes {
     /// `paused()` on the token proxy.
