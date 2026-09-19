@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: foundry-rs/foundry-action@v1
+      - uses: foundry-rs/foundry-toolchain@v1  # coordinator fix: foundry-action does not exist (repo-not-found on main); this is the maintained action
         with:
           version: v1.8.1  # match local; foundry releases change tool behavior
       # deps are pinned plain files (foundry.lock + .gitmodules), never git
