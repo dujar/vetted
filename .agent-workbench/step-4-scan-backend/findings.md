@@ -1,6 +1,6 @@
 # Step 4 — scan backend (verdict engine, watchdog, drift-revoke)
 
-status:     blocked
+status:     ready-to-merge
 branch:     step-4-scan-backend (1 commit 66017a7, based directly on main tip 7a1c744 — rebase is a no-op; the "base predates main" note in the dispatch was stale)
 deployed:   not deployed this step (step-1 hello worker still live at vetted-scan-backend.dujar-coding.workers.dev; the step-4 deploy + deployments/worker.json record are post-review/post-merge work)
 
@@ -51,6 +51,14 @@ shared TS 18, `cargo check --target wasm32-unknown-unknown` clean.
   `record: null` and degrades to canonical-fetch-only rules (deliberate, verify loose end 1).
 - Signing recipe landed as compiled-and-tested in-crate (`signer.rs`: EIP-1559 sync-sign + recover,
   revoke encoding carries the pinned selector); the `scripts/registrar-cli` fallback never triggered.
+
+## Review round 2 (2026-09-20) — APPROVED, 0 blocking
+Both blockers independently re-verified fixed (reviewer re-ran the suite and the viem byte-exact
+check this round, not taken from my report); round-2 diff scoped to fix files + workbench docs,
+no scope creep. Carried items are coordinator-level: N3 (matcher = F2–F4 subset of step-6's
+FINGERPRINT.md — deliberate, criteria hold), N4 (spec's 6,092/~150-per-day watchdog figures
+measured stale — product-copy correction), N7 (step-5 api.ts WatchdogStats gains provenanceUrl
+at step-8 reconciliation).
 
 ## Review round 1 (2026-09-20) — 2 blocking, both fixed this commit
 - B1 signer.rs ABI offset: `abi_encode_revoke` wrote the (address,string) string head offset as

@@ -58,3 +58,31 @@ Non-blocking notes (do not withhold approval):
 ## Verdict
 
 Two blocking findings (B1 ABI offset — every drift-revoke tx reverts on-chain; B2 dangling ./events export — shared entry breaks standalone). Both are one-line fixes with test pins; everything else — including the two hard judgment calls (fingerprint composition, watchdog degrade) — holds as built.
+
+## Round 2 (2026-09-20) — re-check of 4bcabe7..24628f7
+
+Both blockers verified fixed, independently re-run on the branch:
+
+- B1 FIXED — signer.rs:26 writes 0x40, and revoke_encoding_carries_the_pinned_selector now
+  asserts the offset word (data[36..68] == 0x40 word), so the regression is pinned. Post-fix
+  encoder output is byte-exact vs viem encodeFunctionData of the pinned revoke(address,string)
+  (266 hex chars: afd0224b | token | 0x40 | len 0x13 | padded data) — reconfirmed this round,
+  not taken from the builder's report. Test passes; suite green (37+5).
+- B2 FIXED — index.ts exports only abi/types/watchdog; the ./events line replaced by a comment
+  naming step-3's merge as the ship point. tsc on the shared entry now clean (round 1's TS2307
+  gone); vitest still 18/18.
+- N1/N2/N6 taken as prescribed: phantom tests/live_integration.rs reference reworded to
+  "deferred" (watchdog.rs + findings.md); stale "not pinned yet" comments in rules.rs/drift.rs
+  corrected to describe the shipped pinned-topic0 behavior; FRESH_BUYER comment now accurate.
+- N5/N8 knowingly kept with reasons recorded in findings.md — acceptable. N3/N4 coordinator-
+  carried; N7 is step-5's file, correctly untouched.
+- Round-2 diff scope: only the fix files + workbench docs — no scope creep.
+- Re-run this round: scan-backend 42/42, wasm32 check clean, shared Rust 4/4, shared TS 18/18,
+  tsc clean.
+
+### Verdict
+
+APPROVED — 0 blocking. Remaining carried items are coordinator-level, not code: N3 (matcher
+implements F2–F4 of step-6's FINGERPRINT.md — deliberate subset, criteria hold), N4 (spec's
+6,092/~150-per-day watchdog figures measured stale — product copy correction), N7 (step-5
+api.ts WatchdogStats gains provenanceUrl at step-8 reconciliation).
