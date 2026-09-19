@@ -4,3 +4,5 @@
  */
 export * from "./abi";
 export * from "./types";
+export * from "./watchdog";
+export * from "./events";

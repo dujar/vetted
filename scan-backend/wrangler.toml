@@ -5,4 +5,27 @@ compatibility_date = "2026-08-01"
 [build]
 command = "cargo install -q 'worker-build@^0.8' && worker-build --release"
 
-# Step 4 adds the cron trigger (registrar drift-revoke) and secrets here.
+[vars]
+# Per-chain Canonical Registry addresses (verify loose end 1). Empty/unset =>
+# /scan serves record:null and the registry-dependent rules degrade to
+# canonical-fetch-only. Step 3's scratch deploys + step 7's 4663 deploy fill
+# these (deployments/421614.json, 46630.json, 4663.json).
+REGISTRY_ADDRESS_4663 = ""
+REGISTRY_ADDRESS_46630 = ""
+REGISTRY_ADDRESS_421614 = ""
+# Public L1 RPC for the deferred live watchdog counter (the reconcile-measured
+# degrade path ships by default — src/watchdog.rs). Override if it rate-limits.
+L1_RPC_URL = "https://ethereum-rpc.publicnode.com"
+# Operator-pinned extra tokens the drift-watch walks beyond the issuer list
+# (comma-separated) — step 6's replicas go here for the demo beat.
+DRIFT_EXTRA_TOKENS = ""
+
+[triggers]
+# Registrar drift-revoke cron (spec.md:35) — the manual POST
+# /registry/drift-check exists for the demo's upgrade beat reliability; this
+# cron is the production story.
+crons = ["*/15 * * * *"]
+
+# Secrets — set with `wrangler secret put`, never committed:
+#   REGISTRAR_KEY       EIP-1559 signer key for revoke (knowledge/rust-wasm-signing.md)
+#   DRIFT_ADMIN_SECRET  gates POST /registry/drift-check

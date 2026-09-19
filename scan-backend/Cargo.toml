@@ -9,7 +9,32 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 worker = "0.8.5"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 
-# No dev-dependencies: unit tests target the pure route fn (verify.md loose
-# end 5) — wasm-bindgen-bound types panic on non-wasm targets, so the
-# #[event(fetch)] handler stays a thin wrapper and tests stay host-native.
+# The shared wire contract — the engine emits these exact types, so the worker
+# cannot drift from packages/shared (golden fixtures are the contract test).
+vetted-shared = { path = "../packages/shared" }
+
+# EIP-1559 signing for the registrar drift-revoke — the compile-verified recipe
+# from .agent-workbench/knowledge/rust-wasm-signing.md. Do not bump the alloy
+# set piecemeal: they were verified together at 2.4.2 on wasm32-unknown-unknown.
+alloy-signer-local = { version = "2.4.2", default-features = false }
+alloy-signer = { version = "2.4.2", default-features = false }
+alloy-consensus = { version = "2.4.2", default-features = false }
+alloy-eips = { version = "2.4.2", default-features = false, features = ["std"] }
+alloy-network = { version = "2.4.2", default-features = false }
+# k256 must stay 0.13 — alloy-signer-local pins ^0.13; adding 0.14 alongside
+# yields two incompatible k256 crates (rust-wasm-signing.md).
+k256 = { version = "0.13", default-features = false, features = ["ecdsa", "arithmetic"] }
+# getrandom enters via crypto-bigint -> rand_core -> elliptic-curve; without the
+# js feature the wasm32 build dies at getrandom's compile_error! (not a runtime
+# panic). Libraries won't enable it — this crate must.
+getrandom = { version = "0.2", features = ["js"] }
+# keccak256 + U256 (codehashes, u256 riskFlags as decimal) — same primitives the
+# alloy stack already pulls in; no new dependency graph.
+alloy-primitives = { version = "1", default-features = false, features = ["std"] }
+
+[dev-dependencies]
+# Native-only async tests (mock transport); never compiled into the wasm artifact.
+tokio = { version = "1", features = ["macros", "rt"] }

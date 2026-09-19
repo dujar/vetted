@@ -16,6 +16,7 @@ import {
 } from "../abi";
 import type { GuardRevert, ScanResponse } from "../types";
 import { TERMINAL_STATES, VERDICTS } from "../types";
+import type { WatchdogStats } from "../watchdog";
 import { toFunctionSelector } from "viem";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -74,6 +75,34 @@ describe("guard fixtures", () => {
       expect(reSerialized).toBe(raw);
       expect((parsed as GuardRevert).reason).toBe(file.replace(".json", ""));
       expect((parsed as GuardRevert).description.length).toBeGreaterThan(0);
+    });
+  }
+});
+
+describe("watchdog fixtures", () => {
+  const dir = path.join(ROOT, "fixtures", "watchdog");
+  const files = readdirSync(dir).sort();
+
+  it("has exactly the OK and DEGRADED shapes", () => {
+    expect(files).toEqual(["WATCHDOG_DEGRADED.json", "WATCHDOG_OK.json"]);
+  });
+
+  for (const file of files) {
+    it(`${file} round-trips byte-identically`, () => {
+      const { raw, reSerialized, parsed } = roundtrip(path.join(dir, file));
+      expect(reSerialized).toBe(raw);
+      const stats = parsed as WatchdogStats;
+      expect(stats.chainId).toBe(4663);
+      expect(stats.baselinePerDay).toBeGreaterThan(0);
+      // The degrade sentinel: runs 0 carries a provenance link and is never
+      // presented as a measured zero (wire.md, Watchdog API).
+      if (stats.runs === 0) {
+        expect(file).toBe("WATCHDOG_DEGRADED.json");
+        expect(stats.provenanceUrl).toMatch(/^https?:\/\//);
+      } else {
+        expect(stats.runs).toBeGreaterThan(0);
+        expect(stats.provenanceUrl).toMatch(/^https?:\/\//);
+      }
     });
   }
 });
