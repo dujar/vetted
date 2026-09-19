@@ -1,0 +1,4 @@
+# Foundry deps are restored with `forge install` inside this directory
+# (reads .gitmodules + foundry.lock). Never commit lib/ — same discipline
+# as the spike (step-2 findings).
+lib/
