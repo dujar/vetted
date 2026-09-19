@@ -1,7 +1,7 @@
 # Step 6 — demo replica assets
 
-status:     ready-to-merge
-branch:     step-6-replica-assets (worktree /home/bitslicer/projects/vetted-step6-wt, based on main 43efd99)
+status:     merged
+branch:     step-6-replica-assets (merged into main as 8c80aad via --no-ff; merge suite green on main: forge 14/14, contracts wasm+native, scan-backend 3, shared 15, frontend 84; pushed)
 reconciled:
 deployed:   not deployed — 4663/46630/421614 addresses PENDING on funding (throwaway key 0x151e…8E4C read 0 wei on all three at close, 2026-09-19); deploy rehearsed green on local anvil; runbook in demo/assets.md + below
 
