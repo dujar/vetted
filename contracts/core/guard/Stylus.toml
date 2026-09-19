@@ -1,0 +1,5 @@
+# Marks this crate as a Stylus contract for cargo-stylus (cargo-workspace
+# support since sdk 0.10.0 — the WORKSPACE ROOT Stylus.toml carries the
+# required [workspace] manifest; both files are needed). [wasm-opt] pinning
+# goes here if reproducible builds ever need it.
+[workspace.networks]
