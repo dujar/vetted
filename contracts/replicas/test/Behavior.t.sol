@@ -72,8 +72,6 @@ contract BehaviorTest is Cast {
         token.transfer(buyer, 1e18);
     }
 
-    // --- fail-closed beacon resolution ---
-
     // --- the upgrade beat (revocation trigger) ---
 
     function test_upgrade_swaps_impl_under_fixed_proxy_and_state_survives() public {

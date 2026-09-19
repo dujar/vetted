@@ -78,6 +78,19 @@ job (verify loose end 4), deployments/README.md writer column for step 6
   demo/assets.md (Blockscout, trailing `/api/`; browser-UI fallback for the
   mainnet Cloudflare challenge). 421614 needs Etherscan-v2 + key.
 
+## Review round 1 (APPROVED) — non-blocking notes, disposition
+
+1. empty `reconciled:` header — BY DESIGN per this process: the dispatch
+   requires findings.md WITHOUT it; the post-merge reconcile round fills it
+   (as in steps 1/2/5). Routed to reconcile, not a defect.
+2. nested OZ dep not in foundry.lock — FIXED: added
+   `lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts` @
+   v5.4.0/c64a1ed to foundry.lock (single pin source); forge test green after.
+3. foundry-action unpinned — FIXED: `version: v1.8.1` input matches local.
+4. run-latest.json churn + duplicate section comment — FIXED: untracked
+   `broadcast/**/run-latest.json` (+ gitignored; run-<ts>.json stays the
+   stable receipt), stray comment removed.
+
 ## Out of scope, left broken
 
 - No live rehearsal/verify receipts: funding pending at close (final poll 0

@@ -26,6 +26,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: foundry-rs/foundry-action@v1
+        with:
+          version: v1.8.1  # match local; foundry releases change tool behavior
       # deps are pinned plain files (foundry.lock + .gitmodules), never git
       # submodules — forge hoists submodule installs to the git root, which
       # is wrong for a nested foundry project (see contracts/replicas/README.md)
