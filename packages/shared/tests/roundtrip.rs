@@ -9,6 +9,7 @@ use serde_json::Value;
 use vetted_shared::types::{
     GuardRevert, GuardRevertReason, RecordStatus, ScanResponse, TerminalState, Verdict,
 };
+use vetted_shared::watchdog::WatchdogStats;
 
 fn read_json(path: &std::path::Path) -> (String, Value) {
     let raw = fs::read_to_string(path).expect("fixture readable");
@@ -90,6 +91,36 @@ fn guard_fixtures_round_trip_and_cover_all_reasons() {
         .collect(),
         "all five reasons covered verbatim"
     );
+}
+
+#[test]
+fn watchdog_fixtures_round_trip_and_carry_the_degrade_sentinel() {
+    let mut dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    dir.push("fixtures/watchdog");
+
+    let mut files: Vec<_> = fs::read_dir(&dir)
+        .expect("watchdog fixture dir")
+        .map(|e| e.unwrap().path())
+        .collect();
+    files.sort();
+    assert_eq!(files.len(), 2, "OK + DEGRADED shapes");
+
+    for file in files {
+        let (raw, value) = read_json(&file);
+        let stats: WatchdogStats = serde_json::from_str(&raw).expect("deserializes as WatchdogStats");
+        let re: Value = serde_json::to_value(&stats).expect("reserializes");
+        assert_eq!(re, value, "{}: structural round-trip", file.display());
+        assert_eq!(stats.chain_id, 4663);
+        assert!(stats.baseline_per_day > 0);
+        let name = file.file_stem().unwrap().to_str().unwrap();
+        if stats.runs == 0 {
+            assert_eq!(name, "WATCHDOG_DEGRADED", "runs 0 is the degrade sentinel only");
+            assert!(stats.provenance_url.is_some(), "degrade still cites its provenance");
+        } else {
+            assert_eq!(name, "WATCHDOG_OK");
+            assert!(stats.provenance_url.is_some());
+        }
+    }
 }
 
 #[test]

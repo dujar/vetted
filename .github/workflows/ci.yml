@@ -47,6 +47,13 @@ jobs:
       - uses: actions/checkout@v4
       - run: cargo test
         working-directory: scan-backend
+      # The signing recipe's known risk is wasm32-only (getrandom js
+      # compile_error, alloy on wasm32 — knowledge/rust-wasm-signing.md):
+      # native cargo test staying green while the deployed artifact stops
+      # compiling is the trap this check closes (step-4 verify loose end 7;
+      # step-1-owned file, edit flagged at merge).
+      - run: cargo check --target wasm32-unknown-unknown
+        working-directory: scan-backend
 
   shared:
     runs-on: ubuntu-latest

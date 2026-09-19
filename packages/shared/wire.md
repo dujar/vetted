@@ -101,3 +101,22 @@ at merge — consumers read the constant, never the placeholder value.
   files and re-export them — never edit another step's module.
 - Wording discipline: Canonical Registry / verification record / registrar —
   never "attestation" (spec.md:35).
+
+## Watchdog API
+
+`GET /watchdog?chainId=<number>` → `WatchdogStats` (`watchdog.ts` /
+`watchdog.rs`, added step 4; step 5's local declaration in
+`frontend/src/lib/api.ts` moves here at step 8's reconciliation):
+
+- `chainId` — echoed back.
+- `runs` — cumulative sequencer-filterer runs, ONE RPC read upstream
+  (spec.md:37). `runs: 0` WITH a `provenanceUrl` means the live count is
+  UNAVAILABLE (the degrade path) — never a measured zero on a launched chain.
+- `baselinePerDay` — the published 6-week baseline as a daily rate (~150/day,
+  measured 2026-08). Never recomputed, never stored.
+- `provenanceUrl` — where the numbers come from: the live counter's public
+  entry, or the published-baseline source when degraded; `null` = no
+  provenance at all.
+
+No stored history anywhere (spec.md:37) — the endpoint is stateless and the
+registry/state carries nothing for it.

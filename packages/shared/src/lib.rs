@@ -6,3 +6,6 @@
 
 #[path = "../types.rs"]
 pub mod types;
+
+#[path = "../watchdog.rs"]
+pub mod watchdog;
