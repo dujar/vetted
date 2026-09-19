@@ -1,0 +1,20 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.28"
+evm_version = "cancun"
+remappings = [
+    "forge-std/=lib/forge-std/src/",
+    "@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/",
+]
+# the OZ libs ship their own test/certora trees — never part of this build
+skip = [
+    "lib/openzeppelin-contracts-upgradeable/test",
+    "lib/openzeppelin-contracts-upgradeable/certora",
+    "lib/openzeppelin-contracts-upgradeable/lib",
+]
+
+[profile.default.fuzz]
+runs = 256

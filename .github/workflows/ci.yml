@@ -21,6 +21,26 @@ jobs:
         run: cargo test --workspace
         working-directory: contracts
 
+  replicas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-action@v1
+        with:
+          version: v1.8.1  # match local; foundry releases change tool behavior
+      # deps are pinned plain files (foundry.lock + .gitmodules), never git
+      # submodules — forge hoists submodule installs to the git root, which
+      # is wrong for a nested foundry project (see contracts/replicas/README.md)
+      - name: Restore pinned deps (plain clones at foundry.lock revs)
+        run: |
+          cd contracts/replicas
+          git clone --depth 1 --branch v1.16.2 https://github.com/foundry-rs/forge-std lib/forge-std
+          git clone --depth 1 --branch v5.4.0 https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable lib/openzeppelin-contracts-upgradeable
+          git clone --depth 1 --branch v5.4.0 https://github.com/OpenZeppelin/openzeppelin-contracts lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts
+      - name: forge build + fingerprint/behavior tests
+        run: forge test
+        working-directory: contracts/replicas
+
   scan-backend:
     runs-on: ubuntu-latest
     steps:
