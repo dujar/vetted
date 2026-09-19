@@ -3,6 +3,7 @@
 status:     merged
 branch:     step-5-frontend-screens (merged into main as e37bc15 via --no-ff; merge suite green on main: frontend build + 84 tests, shared 15; CI run 34667626718 SUCCESS on the branch)
 deployed:   not deployed (pages redeploy is step 8/10's job)
+reconciled: 2026-09-19 (folded into plans 3–10; judge round 3: SHIPPABLE — reconciliation/2026-09-19-steps-2-and-5-findings.md)
 
 ## What was built
 
