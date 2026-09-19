@@ -13,8 +13,9 @@
 //!   InboxMessageDelivered(uint256,bytes) at 0xff64905f…).//! The published figures (xroot, third-party, 2026-08) evidently count
 //! something else that is not on-chain enumerable. Per the plan's
 //! pre-committed escape, the endpoint ships the degrade path — baseline +
-//! provenance link — and flags the coordinator. The live read stays available
-//! in tests/live_integration.rs for the day the mechanism is pinned.
+//! provenance link — and flags the coordinator. A live counter read is
+//! deferred until a mechanism that reconciles with the published figures
+//! is pinned.
 //!
 //! Wire semantics (wire.md "Watchdog API"): `runs: 0` with a `provenanceUrl`
 //! means the live count is UNAVAILABLE — never a measured zero.

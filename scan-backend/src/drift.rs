@@ -3,10 +3,9 @@
 //! state — this only sends the revoke transaction the registry already
 //! understands; no database anywhere.
 //!
-//! ponytail: candidate enumeration walks the issuer list (+ DRIFT_EXTRA_TOKENS)
-//! — the registry's Verify/Revoke event signatures are not pinned yet (verify
-//! loose end 2), so event-log enumeration is unavailable; switch to it when
-//! step 3's merge pins the events into packages/shared.
+//! Candidates: Verify-event enumeration (topic0 pinned in hexutil::events,
+//! byte-equal to step-3's events.ts) + the issuer list (+ DRIFT_EXTRA_TOKENS);
+//! each source degrades independently.
 
 use alloy_signer_local::PrivateKeySigner;
 use serde::Serialize;

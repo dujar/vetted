@@ -26,8 +26,8 @@ shared TS 18, `cargo check --target wasm32-unknown-unknown` clean.
   events ~2,630/day vs ~150/day, with fork-specific event signatures. The plan's pre-committed escape
   was exercised correctly: `/watchdog` ships the degrade path — `runs: 0` + `provenanceUrl` (wire.md
   sentinel: 0 = unavailable, never a measured zero) + baseline 150/day. **COORDINATOR FLAG** (the
-  plan's escape requires it): the counter mechanism stays unpinned; the live read is kept in tests
-  for the day one reconciles.
+  plan's escape requires it): the counter mechanism stays unpinned; a live counter read is
+  deferred until a mechanism that reconciles with the published figures is pinned.
 - Nothing else. verify.md's 8 loose ends are all applied as prescribed (wrangler REGISTRY_ADDRESS_*
   vars with canonical-only degrade; revocationTx null-degrade path; L1_RPC_URL + nullable
   provenanceUrl + degrade sentinel; registrar-cli fallback unused because signing compiled in-crate;
@@ -51,6 +51,27 @@ shared TS 18, `cargo check --target wasm32-unknown-unknown` clean.
   `record: null` and degrades to canonical-fetch-only rules (deliberate, verify loose end 1).
 - Signing recipe landed as compiled-and-tested in-crate (`signer.rs`: EIP-1559 sync-sign + recover,
   revoke encoding carries the pinned selector); the `scripts/registrar-cli` fallback never triggered.
+
+## Review round 1 (2026-09-20) — 2 blocking, both fixed this commit
+- B1 signer.rs ABI offset: `abi_encode_revoke` wrote the (address,string) string head offset as
+  0x60; standard ABI is 0x40 — every drift-revoke tx would revert on abi.decode. Fixed to 0x40
+  AND the test now asserts the offset word (regression pinned). Reviewer verified byte-exact
+  against viem's encoding of the pinned `revoke` selector; fix changes only that word.
+  Independently reconfirmed post-fix: the encoder's output is byte-identical (266 hex chars,
+  incl. the 0x40 offset word) to viem `encodeFunctionData` for the same args.
+- B2 packages/shared/index.ts: dropped `export * from "./events";` — events.ts exists only on
+  step-3's branch; the export ships with step-3's merge (the line is replaced by a comment saying
+  exactly that).
+- Non-blocking: N1 phantom tests/live_integration.rs reference — comment + this file reworded to
+  "deferred"; N2 stale "not pinned yet (verify loose end 2)" comments in rules.rs/drift.rs —
+  corrected (behavior already uses the pinned topic0s); N6 FRESH_BUYER comment corrected.
+  Knowingly kept: N5 fingerprint.rs:90 always-true guard (no live path reaches zero impl_addr;
+  a real fix is a zero-address comparison, out of round-1 scope); N8 rpc.rs estimate_gas kept
+  for steps 7/9 (zero callers today, deliberate per drift.rs's fixed-400k ponytail). N3
+  (matcher = F2–F4 subset of FINGERPRINT.md) and N4 (spec's 6,092/~150-per-day measured stale)
+  are coordinator-carried, not code. N7 is step-5's api.ts, outside this diff's scope.
+- Suite re-run after fixes: scan-backend cargo test green, wasm32 check clean, shared Rust +
+  TS green, tsc on the shared entry green.
 
 ## Out of scope, left broken
 - `.agent-workbench/step-6-replica-assets/findings.md` on main still has an empty `reconciled:` —

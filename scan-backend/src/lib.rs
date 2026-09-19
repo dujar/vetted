@@ -25,7 +25,8 @@ use worker::*;
 
 use rules::{Probes, ScanInputs, Structure};
 
-/// The calibration probe buyer (a fresh EOA the spike's live reads used).
+/// The calibration probe buyer (a well-known funded EOA the spike's live
+/// reads used — probes judge answered-vs-reverted, never the answer).
 const FRESH_BUYER: &str = "0xd8da6bf26964af9d7eed9e03e53415d37aa96045";
 
 /// The calibrated shared implementation (calibration_4663.json) — the

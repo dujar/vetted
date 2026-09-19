@@ -19,8 +19,9 @@ pub fn abi_encode_revoke(token: &str, reason: &str) -> Vec<u8> {
     let mut out = Vec::new();
     out.extend_from_slice(&hexutil::decode_hex(selectors::REVOKE).unwrap());
     out.extend_from_slice(&hexutil::decode_hex(&hexutil::addr_word(token)).unwrap());
-    // string: offset 0x60, length, word-padded data
-    out.extend_from_slice(&U256::from(0x60u64).to_be_bytes::<32>());
+    // string: head offset 0x40 (offset is relative to the args block start:
+    // token word + offset word = 64 bytes), then length, then word-padded data
+    out.extend_from_slice(&U256::from(0x40u64).to_be_bytes::<32>());
     let reason_bytes = reason.as_bytes();
     out.extend_from_slice(&U256::from(reason_bytes.len()).to_be_bytes::<32>());
     out.extend_from_slice(reason_bytes);
@@ -93,6 +94,13 @@ mod tests {
         );
         assert_eq!(hexutil::encode_hex(&data[..4]), "afd0224b");
         assert_eq!(data.len(), 4 + 32 * 4, "selector + token + offset + len + 1 word");
+        // head offset of the string is 0x40 — a standard decoder seeks
+        // args + 0x40 for the length word; 0x60 here made every revoke revert
+        assert_eq!(
+            &data[4 + 32..4 + 64],
+            &U256::from(0x40u64).to_be_bytes::<32>(),
+            "string head offset must be 0x40"
+        );
         // reason is 19 bytes, padded in the last word
         assert_eq!(&data[4 + 96 + 19..], &vec![0u8; 13][..]);
     }

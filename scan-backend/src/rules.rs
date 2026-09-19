@@ -81,10 +81,10 @@ pub struct ScanInputs {
     /// Issuer canonical list unreachable (journeys.md:20): ALL verdicts drop
     /// to UNVERIFIED. Only settable on 4663 — other chains never fetch it.
     pub degraded: bool,
-    /// Revocation tx (journeys.md:14). Live source: step 3's registry `Revoke`
-    /// event logs — the event signature is not pinned yet (verify loose end 2),
-    /// so the live path ships revocationTx:null on the frontend's existing
-    /// "not indexed yet" rendering until step 3's merge pins it.
+    /// Revocation tx (journeys.md:14). Live source: the registry's `Revoke`
+    /// event logs (topic0 pinned in hexutil::events, byte-equal to step-3's
+    /// events.ts); a failed read degrades to null — the frontend's existing
+    /// "not indexed yet" rendering.
     pub revocation_tx: Option<String>,
 }
 

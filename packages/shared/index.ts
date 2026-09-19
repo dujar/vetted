@@ -5,4 +5,4 @@
 export * from "./abi";
 export * from "./types";
 export * from "./watchdog";
-export * from "./events";
+// events.ts ships with step-3's merge — its re-export lands there, not here.
