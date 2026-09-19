@@ -6,11 +6,16 @@
 - knows:   ../knowledge/frontend-stack.md, ../knowledge/robinhood-chain.md
 - learned: ../step-3-contracts-core/findings.md, ../step-4-scan-backend/findings.md, ../step-5-frontend-screens/findings.md, ../step-6-replica-assets/findings.md
 - learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — pinned selectors/revert-reason literals, live-probed RPCs, e2e/ reserved)
+- learned: ../../spike/findings.md  (step-2 findings — MERGED at 9d8dc30; file lives in the REPO at `spike/findings.md`: calibrated probe targets — blocklist evidence is a BEACON probe — and the live canonical-fetch worker)
 
 > **Revised** — step-1 findings reconciliation (2026-09-11):
 > 1. Task 3's byte-exact revert assertions: `packages/shared/abi.ts` exports SELECTORS and GUARD_REVERT_REASONS as pinned literals (kept literal precisely so e2e can use them without a runtime) — import them in the specs; never retranscribe strings or selectors.
 > 2. Task 1's fixture loader reads `deployments/*.json` — writers are step 3 (`421614.json`/`46630.json`) and step 6 (replica fields appended to the same files); the scratch-chain RPC (46630 = `https://rpc.testnet.chain.robinhood.com`) is live-probed and pinned in `packages/shared/wire.md` + `frontend/src/lib/chains.ts`.
 > 3. `e2e/` exists in the tree (`.gitkeep` added in review round 1) — survives clean checkout; CI will not see these specs per-push (step task 6's on-demand mode is deliberate).
+
+> **Revised** — step-2 + step-5 findings reconciliation (2026-09-19):
+> 1. **The frontend has a mock/live env contract** (step 5, MERGED): mock is the default; `VITE_API_MODE=live` + `VITE_API_URL` (→ step 4's worker) + `VITE_REGISTRY_ADDRESS`/`VITE_GUARD_ADDRESS` (→ the step-3/6 scratch deployments in `deployments/*.json`) flips every client live (`frontend/src/lib/api.ts`, `guard.ts`, `wallet.ts`, `registry.ts`). Use it: CI-capable specs can run the whole stack against mock fixtures, and the scratch-chain pass (task 5) runs the same specs with live env — no page edits either way.
+> 2. **Known defect inherited from step 5** (its findings' "out of scope, left broken" understates it): `ViemGuardProbeSource.isBlocked` probes the TOKEN with the blocklist selector (`frontend/src/lib/guard.ts:186-188`) instead of the resolved beacon — on genuine-pattern tokens that reverts and degrades to a "probe unavailable" advisory row. Safe (advisory rows never block, spec.md:28), but it means the J1 blocklist evidence row is only real via step 4's server-side beacon probe. Assert blocklist power-report evidence against the `/scan` payload, NOT the frontend preview row; file the frontend fix (probe the beacon, like `resolvedImpl` already does) back to the step-5 owner per this step's scope rule — do not let a green preview assertion canonize the wrong target.
 
 ## Stack
 Playwright + an injected EIP-1193 stub wallet (provider shim backed by a funded demo key on the scratch chain — 46630, or 421614 if step-2 findings say 46630 gas never materialized) — real signatures against real deployments, no browser-extension flakiness.

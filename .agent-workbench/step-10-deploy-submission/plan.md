@@ -5,8 +5,11 @@
 - knows:   ../knowledge/robinhood-chain.md, ../knowledge/arbitrum-sepolia.md, ../knowledge/goplus-api.md, ../knowledge/eas.md, ../knowledge/contract-verification.md  (rehearsed Q&A ammo; verification re-check recipes :12–38)
 - learned: ../step-7-contract-hardening/findings.md, ../step-9-demo-harness/findings.md
 - learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — deploy pipeline proven, env audit facts)
+- learned: ../../spike/findings.md  (step-2 findings — MERGED at 9d8dc30; file lives in the REPO at `spike/findings.md`: canonical-fetch worker LIVE as fallback mirror) + ../step-5-frontend-screens/findings.md  (MERGED at e37bc15 — the frontend env contract this step's audit must set)
 
 > **Revised** — step-1 findings reconciliation (2026-09-11): task 2's env audit needs no deploy-credential work — the wrangler OAuth token already has workers+pages scopes (hello worker + Pages live since step 1: `vetted-scan-backend.dujar-coding.workers.dev`, `vetted-1un.pages.dev`, alias in `deployments/pages.json`). The **only outstanding operator action in the whole project is the WalletConnect Cloud projectId** (`VITE_WALLETCONNECT_PROJECT_ID`) — without it the frontend boots read-only with zero connectors by design (not a bug). Check task's URL resolution: per-deployment URL probes intermittently failed TLS from the dev machine only — treat a local TLS failure as suspect and re-verify from off-machine before flagging a URL dead.
+
+> **Revised** — step-2 + step-5 findings reconciliation (2026-09-19): task 2's env audit now has a concrete frontend list from step 5's contract — `VITE_API_MODE=live` + `VITE_API_URL` (→ step-4 worker), `VITE_REGISTRY_ADDRESS`/`VITE_GUARD_ADDRESS` (→ `deployments/4663.json`, written by step 7), `VITE_WALLETCONNECT_PROJECT_ID`. The spike's canonical-fetch worker (`vetted-spike-canonical-fetch.dujar-coding.workers.dev`, live 2026-09-19, 194 assets) is a FALLBACK mirror — production `/scan` absorbs the fetch (step 4); smoke should confirm the absorbed path, not the spike URL.
 
 ## Stack
 As built; no new dependencies.

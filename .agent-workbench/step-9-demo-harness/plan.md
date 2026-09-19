@@ -6,8 +6,11 @@
 - knows:   ../knowledge/robinhood-chain.md (RPC/explorer URLs :14–21), ../knowledge/goplus-api.md (copy branch :26–27)
 - learned: ../step-3-contracts-core/findings.md, ../step-4-scan-backend/findings.md, ../step-6-replica-assets/findings.md, ../step-8-e2e-journeys/findings.md
 - learned: ../step-1-repo-scaffold/findings.md  (scaffold MERGED at 5e2ff35 — live-verified RPC/URL table, production worker+pages already deployed)
+- learned: ../../spike/findings.md  (step-2 findings — MERGED at 9d8dc30; file lives in the REPO at `spike/findings.md`: canonical-fetch worker LIVE, calibrated probe targets) + ../step-5-frontend-screens/findings.md  (MERGED at e37bc15 — mock/live env contract for the screens)
 
 > **Revised** — step-1 findings reconciliation (2026-09-11): the runbook's endpoints and beat URLs come from the live-verified table in `packages/shared/wire.md` (chains) and `deployments/{worker,pages}.json` — the production worker (`vetted-scan-backend.dujar-coding.workers.dev`) and Pages (`vetted-1un.pages.dev`) have been live since step 1. Caveat carried in findings: per-deployment URL probes intermittently failed TLS from the dev machine only — if a beat URL "fails" during a dry run, re-check from off-machine before rewriting the runbook fallback.
+
+> **Revised** — step-2 + step-5 findings reconciliation (2026-09-19): the power-report beat's blocklist evidence is real only via step 4's server-side BEACON probe (the calibrated blocklist state lives on the beacon; the frontend's live preview row degrades to "probe unavailable" on genuine-pattern tokens — known step-5 defect, see step 8's Revised note 2). Narrate the power report from the `/scan` verdict payload, not the preview rows. The live-scan beat's canonical ground truth is backed by the live canonical-fetch worker (194 assets, re-verified 2026-09-19) absorbed into step 4's worker.
 
 ## Stack
 Bash + cast + OBS recording; no new runtime dependencies.
