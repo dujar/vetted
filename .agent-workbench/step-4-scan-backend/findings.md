@@ -1,12 +1,14 @@
 # Step 4 — scan backend (verdict engine, watchdog, drift-revoke)
 
 status:     ready-to-merge
-branch:     step-4-scan-backend (1 commit 66017a7, based directly on main tip 7a1c744 — rebase is a no-op; the "base predates main" note in the dispatch was stale)
-deployed:   not deployed this step (step-1 hello worker still live at vetted-scan-backend.dujar-coding.workers.dev; the step-4 deploy + deployments/worker.json record are post-review/post-merge work)
+branch:     step-4-scan-backend
+deployed:   PRE-FIX bundle live at https://vetted-scan-backend.dujar-coding.workers.dev (deployed 2026-09-20 from merged main ebaa61c, version 34d865dd; redeploy required after the probe-evidence fix below merges)
+branch:     step-4-scan-backend
+deployed:   PRE-FIX bundle live at https://vetted-scan-backend.dujar-coding.workers.dev (deployed 2026-09-20 from merged main ebaa61c, version 34d865dd; redeploy required after the probe-evidence fix below merges)
 
-Review round PENDING — no review-agent has run on this branch yet. This file was written by the
-continuation builder after the previous builder died post-commit; the caller holds the review-agent
-dispatch. verify.md is copied into this dir so it travels with the merge.
+History: written by the continuation builder after the previous builder died post-commit; the
+approved body merged to main as ebaa61c and deployed; the probe-evidence fix below is the only
+unmerged work. verify.md + review.md travel in this dir.
 
 ## What was built
 (Previous builder, committed; re-verified green by the continuation builder.) Stateless Workers-Rust
@@ -51,6 +53,27 @@ shared TS 18, `cargo check --target wasm32-unknown-unknown` clean.
   `record: null` and degrades to canonical-fetch-only rules (deliberate, verify loose end 1).
 - Signing recipe landed as compiled-and-tested in-crate (`signer.rs`: EIP-1559 sync-sign + recover,
   revoke encoding carries the pinned selector); the `scripts/registrar-cli` fallback never triggered.
+
+## Post-merge live receipt — probe-evidence bug FOUND and FIXED (2026-09-20)
+The approved code merged to main (ebaa61c) and deployed cleanly, but the plan's own live check
+(task 8: P must come back VERIFIED-shaped) exposed a real bug no fixture could see — nothing
+exercised `fingerprint::probe` with a failing read:
+- **Bug:** `probe` collapsed "RPC read failed" (rate limit — the 4663 public RPC throttles
+  Cloudflare egress; live scans oscillate between RPC_RETRYABLE and completing) into the same
+  `false` as "selector reverted". A rate-limited probe then rendered a power-report row
+  ABSENT with `severity: verified` — fabricated negative evidence, violating the spec.md:30
+  evidence rule the step exists to enforce (the verdict side was safe: unanswered withheld
+  VERIFIED → UNVERIFIED, never a wrong positive).
+- **Fix (this branch, needs one review round):** `probe` now returns `Option<Probes>` — a failed
+  read yields None: no probe rows claimed at all, no signature match (honest UNVERIFIED);
+  `false` is only ever a definitive revert (which IS evidence: the mechanism is absent).
+  lib.rs propagates None; rules.rs renders rows only from real evidence; 3 new unit tests pin
+  failed→None, reverted→definitive-negative, answered→PRESENT. Suite: scan-backend 40+5, wasm32 clean.
+- **Environmental (coordinator should know, not a code fix):** the public 4663 RPC rate-limits
+  Cloudflare's shared egress — whole scans intermittently return the DESIGNED `RPC_RETRYABLE`
+  terminal (correct behavior: it tells the UI to retry; it never guesses). A green live P
+  receipt needs a calm rate window plus retries; step 9's demo harness may want scan retries
+  built into the journey scripts. The spike canonical-fetch mirror is unaffected.
 
 ## Review round 2 (2026-09-20) — APPROVED, 0 blocking
 Both blockers independently re-verified fixed (reviewer re-ran the suite and the viem byte-exact

@@ -86,3 +86,35 @@ APPROVED — 0 blocking. Remaining carried items are coordinator-level, not code
 implements F2–F4 of step-6's FINGERPRINT.md — deliberate subset, criteria hold), N4 (spec's
 6,092/~150-per-day watchdog figures measured stale — product copy correction), N7 (step-5
 api.ts WatchdogStats gains provenanceUrl at step-8 reconciliation).
+
+## Round 3 (2026-09-20) — spot review of post-deploy live-check fix e419bc1 (vs merged main ebaa61c)
+
+The bug (invisible to rounds 1–2: no fixture exercised a failing probe read): a rate-limited or
+dropped probe read collapsed into `false` → power-report row rendered ABSENT with severity
+verified — fabricated negative evidence against spec.md:30. Fix verified semantically right:
+
+- The None/false/answered trichotomy is honest under the depth-boundary discipline. Failed read
+  → `None` → `inputs.probes = None` → evaluate claims no probe rows, and `finalize_signature_match`
+  receives (false,false) → no signature match → honest UNVERIFIED; under-claims, never fabricates.
+  Definitive revert → `false` → ABSENT/verified row now backed by real probe evidence — exactly
+  the spec.md:30 row-evidence rule. Answered → PRESENT/risk. Undecodable paused answer (Ok but
+  not a bool) → None: no clean evidence either way, correctly not ABSENT. beacon:None → None
+  (drops the independent paused evidence on beacon-less contracts, but those are already outside
+  the pattern → UNVERIFIED + heuristics; omission is compliant where fabrication was not).
+- Tests pin the three named paths with distinct mock transports: failed-to-None (429 transport),
+  reverted-to-definitive-negative (revert error object → Some(false,false)), answered-to-PRESENT
+  (32-byte bool → Some(true,true)). Re-ran: 3/3 pass.
+- Scope: exactly the declared 4 files (fingerprint.rs fix+tests, lib.rs propagation+comment,
+  rules.rs doc, findings.md). No creep. Suite re-run: 40 unit + 5 golden green, wasm32 clean.
+
+Non-blocking notes (do not withhold approval):
+- R3-N1: blocklist still accepts any `Ok(_)` as answered — an empty "0x" success would render
+  PRESENT/risk without a decodable bool, while paused now requires one. Pre-existing, unchanged
+  by this commit, and the conservative direction (over-warns, never fabricates absence). Fold a
+  decode_abi_bool check in whenever this file is next touched.
+- R3-N2: the undecodable-paused→None and beacon-None→None branches are unpinned by tests (the
+  three dispatch-named paths are pinned). Trivial to add if the suite is touched again.
+
+### Verdict
+
+APPROVED — 0 blocking.

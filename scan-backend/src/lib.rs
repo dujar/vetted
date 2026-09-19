@@ -23,7 +23,7 @@ use vetted_shared::watchdog::WatchdogStats;
 
 use worker::*;
 
-use rules::{Probes, ScanInputs, Structure};
+use rules::{ScanInputs, Structure};
 
 /// The calibration probe buyer (a well-known funded EOA the spike's live
 /// reads used — probes judge answered-vs-reverted, never the answer).
@@ -210,13 +210,19 @@ async fn scan(
     }
 
     // Resolve the beacon (guard-pinned path) + probes at calibrated targets.
+    // probe() yields None when a probe READ failed — the scan then completes
+    // with no probe rows and no signature match (honest UNVERIFIED), never
+    // with fabricated ABSENT rows.
     let mut layout = fingerprint::resolve(&client, &addr, &code).await;
-    let (paused, blocklist) =
-        fingerprint::probe(&client, &addr, layout.beacon.as_deref(), FRESH_BUYER).await;
+    let probes = fingerprint::probe(&client, &addr, layout.beacon.as_deref(), FRESH_BUYER).await;
+    let (paused, blocklist) = probes
+        .as_ref()
+        .map(|p| (p.paused, p.blocklist))
+        .unwrap_or((false, false));
     fingerprint::finalize_signature_match(&mut layout, paused, blocklist);
 
     let mut inputs = ScanInputs::new(chain_id, &addr);
-    inputs.probes = Some(Probes { paused, blocklist });
+    inputs.probes = probes;
     inputs.structure = Some(Structure {
         beacon_proxy: layout.beacon_slot_set && layout.impl_slot_empty,
         beacon: layout.beacon.clone(),
