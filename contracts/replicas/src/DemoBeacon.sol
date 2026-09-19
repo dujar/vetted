@@ -33,7 +33,9 @@ contract DemoBeacon is AccessControlUpgradeable {
 
     constructor(address initialImplementation, address admin) {
         if (initialImplementation == address(0)) revert ZeroImplementation();
-        __AccessControl_init();
+        // no __AccessControl_init() here: this contract is used UNPROXIED, and
+        // the OZ-v5 init fns are onlyInitializing (constructor state reverts).
+        // Role storage defaults are already correct; grants below suffice.
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(PAUSER_ROLE, admin);
         _grantRole(BLOCKLIST_ROLE, admin);
