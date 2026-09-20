@@ -1,6 +1,6 @@
 # Step 3 — contracts-core (Canonical Registry + Guarded Swap, Rust/Stylus)
 
-status:     ready-to-merge
+status:     merged
 branch:     step-3-contracts-core
 deployed:   not deployed — operator key 0x151e9f57F31310aFeBBB60c222c14badCf938E4C has balance 0 on 421614, 46630 and 4663 (cast balance, 2026-09-20); the task 5/6 on-chain RUN and its receipts stay deferred per the standing dispatch (code + script are landed and validated as far as funds allow)
 
