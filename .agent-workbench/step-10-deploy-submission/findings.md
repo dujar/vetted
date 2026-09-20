@@ -2,7 +2,7 @@
 
 status:     ready-to-merge (awaiting review — this invocation has no spawn tool; the caller dispatches review-agent on the branch and re-invokes)
 branch:     step-10-deploy-submission (off main 16baada)
-reconciled:
+reconciled: 2026-09-21 (final step — no remaining plans to update; the findings' deferred items are carried by submission/post-funding-checklist.md and the funded-run go-lists; review APPROVED round 1, recorded on merge commit fe8249d — step-10 has no review.md file)
 deployed:   not deployed — UNFUNDED regime at step start AND end (operator key 0x151e…8E4C reads 0 wei on 4663/421614/46630; re-checked at step end). Two-regime honored: the full unfunded package is built; the funded-run completion is staged as `submission/post-funding-checklist.md`. Funding go/no-go: 2026-09-29 (verify LE 1).
 
 ## What was built
