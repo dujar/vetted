@@ -2,8 +2,17 @@
   "name": "vetted",
   "url": "https://vetted-1un.pages.dev",
   "status": "deployed",
-  "deployedAt": "2026-09-12",
-  "commit": "030301c",
-  "check": "HTTP 200 (live-probed 2026-09-12)",
-  "note": "step-1 static shell (frontend/dist); step 5 ships the real screens"
+  "deployedAt": "2026-09-21",
+  "commit": "step-8-e2e-journeys (branch build, main b889011 + step-8)",
+  "check": "HTTP 200; bundle carries the step-5 screens (hero 'Is this stock token real', Guarded swap) — live-probed 2026-09-21",
+  "note": "step-8 redeploy of the step-5 bundle (verify.md loose end 4 — the production screens ship here). step-1's shell entry is superseded by this append: same writer discipline, production bundle built WITHOUT the e2e-only env (VITE_E2E_STUB_WALLET etc.), so the product default is unchanged",
+  "deploymentPreview": "https://91d1d61e.vetted-1un.pages.dev",
+  "history": [
+    {
+      "deployedAt": "2026-09-12",
+      "commit": "030301c",
+      "note": "step-1 static shell (frontend/dist)",
+      "check": "HTTP 200 (live-probed 2026-09-12)"
+    }
+  ]
 }
