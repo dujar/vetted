@@ -25,6 +25,35 @@
 //! end 3). Param/field names are cosmetic in the ABI — the selectors and
 //! event topics carry no names, and the Rust keyword `impl` is stored as
 //! `impl_addr`/`implAddr`.
+//!
+//! # Security considerations
+//!
+//! The registrar is this contract's single trust root; the full trust model
+//! (registrar-compromise blast radius, why one registrar is acceptable for
+//! v1, revocation-as-safety) lives in `docs/threats.md` §3. In-contract
+//! facts that model rests on:
+//!
+//! - **Authority.** Every write (`verify`, `revoke`, `transfer_registrar`)
+//!   funnels through one `only_registrar` check; there is no other caller-
+//!   -dependent branch anywhere. `transfer_registrar` is the recovery path
+//!   and refuses `address(0)` (a stranded pen would also break the
+//!   zero-registrar-means-no-record convention the guard and every consumer
+//!   key on).
+//! - **No external calls.** The contract makes none — not even token
+//!   callbacks — so there is no reentrancy surface and no return-data
+//!   decoding to attack; the only host interactions are storage, events,
+//!   `msg_sender`, `block_timestamp`, and `native_keccak256`.
+//! - **Fail-total reads.** `get_record` never reverts and encodes
+//!   "unknown" as the all-zero tuple (`registrar == 0`); consumers are
+//!   spec-bound (wire.md) to treat that — or `status > 1` — as no-record,
+//!   never as data. Revocation cannot create rows (`NoRecord`), so the
+//!   guard's `GUARD_NO_RECORD` flag stays meaningful forever.
+//! - **Arithmetic posture.** No arithmetic on user input at all: risk flags
+//!   are an opaque U256 copied verbatim, timestamps are u64 stored/never
+//!   compared, and the only "computation" is the reason hash.
+//! - **Audit trail.** Every write emits its pinned event with the caller's
+//!   claims in full — a false record is public the moment it is written,
+//!   attributed by `registrar` and `verified_at`/`revoked_at`.
 
 #![cfg_attr(not(any(test, feature = "export-abi")), no_main)]
 #![cfg_attr(not(any(test, feature = "export-abi")), no_std)]
@@ -443,5 +472,274 @@ mod test {
             B256::from(revoke),
             b256!("2fa80445a7995a05a1a47457227da064b86a578212322a7cd41a235d469749a1")
         );
+    }
+}
+
+#[cfg(test)]
+mod fuzz {
+    //! Property (fuzz) suite — proptest over the native TestVM host
+    //! (plan task 1). Deterministic: every property runs a FIXED seed with
+    //! 10_000 cases (the plan's "seeded ≥10k" check), so CI failures
+    //! reproduce bit-for-bit anywhere; proptest also shrinks + persists
+    //! counterexamples under `proptest-regressions/`.
+    //!
+    //! One model-based property carries the plan's two registry invariants —
+    //! "registrar authority is the only write path" and "record transitions
+    //! are total and monotone per the rules": an independent mirror model
+    //! predicts, for EVERY op in an arbitrary sequence, exactly which of
+    //! {success, NotRegistrar, NoRecord, ZeroRegistrar} must happen and the
+    //! exact seven-field state afterwards. Exact-state comparison after
+    //! every op subsumes "reverts leave zero state change" (a revert that
+    //! mutated anything would diverge from the model), so no separate
+    //! delta-scan property exists. The J3 read primitive gets its own
+    //! totality property (never reverts, all-zero for unknown tokens).
+
+    use super::*;
+    use alloc::collections::BTreeMap;
+    use proptest::prelude::*;
+    use proptest::test_runner::{Config, RngAlgorithm, TestRng, TestRunner};
+    use stylus_sdk::testing::TestVM;
+
+    const REGISTRAR: Address = const { Address::new([0x11; 20]) };
+    const OTHER: Address = const { Address::new([0x22; 20]) };
+    const TOKEN_A: Address = const { Address::new([0x33; 20]) };
+    const TOKEN_B: Address = const { Address::new([0x34; 20]) };
+    const UNKNOWN: Address = const { Address::new([0x99; 20]) };
+    const NOW: u64 = 1_700_000_000;
+
+    /// Deterministic 10k-case runner: fixed ChaCha seed (proptest's
+    /// documented cross-platform-reproducible mode — same algorithm+seed,
+    /// same cases, every machine), no entropy. The label folds into the
+    /// 32-byte key ChaCha requires, so seed strings stay readable.
+    fn runner(seed: &[u8]) -> TestRunner {
+        let config = Config {
+            cases: 10_000,
+            ..Config::default()
+        };
+        let mut key = [0u8; 32];
+        for (i, b) in seed.iter().enumerate() {
+            key[i % 32] ^= b;
+        }
+        TestRunner::new_with_rng(config, TestRng::from_seed(RngAlgorithm::ChaCha, &key))
+    }
+
+    fn arb_addr() -> impl Strategy<Value = Address> {
+        (any::<u64>(), any::<u64>(), any::<u32>()).prop_map(|(hi, mid, lo)| {
+            let mut bytes = [0u8; 20];
+            bytes[0..8].copy_from_slice(&hi.to_be_bytes());
+            bytes[8..16].copy_from_slice(&mid.to_be_bytes());
+            bytes[16..20].copy_from_slice(&lo.to_be_bytes());
+            Address::new(bytes)
+        })
+    }
+
+    /// The mirror model's idea of one record — exactly the seven fields.
+    #[derive(Clone, Debug, PartialEq)]
+    struct Rec {
+        status: u8,
+        flags: U256,
+        verified_at: u64,
+        impl_: Address,
+        registrar: Address,
+        revoked_at: u64,
+        reason: B256,
+    }
+
+    fn vm_record(registry: &Registry, token: Address) -> Rec {
+        let (status, flags, at, impl_, registrar, revoked, reason) = registry.get_record(token);
+        Rec {
+            status,
+            flags,
+            verified_at: at,
+            impl_,
+            registrar,
+            revoked_at: revoked,
+            reason,
+        }
+    }
+
+    /// The whole assertion surface: registrar, every modeled record, the
+    /// unknown-token zero convention, and timestamp monotonicity.
+    fn assert_vm_matches_model(
+        registry: &Registry,
+        model_registrar: Address,
+        model: &BTreeMap<Address, Rec>,
+        now: u64,
+    ) {
+        assert_eq!(registry.registrar(), model_registrar, "registrar drift");
+        for (token, want) in model {
+            assert!(&vm_record(registry, *token) == want, "record drift for {token}");
+            assert!(want.verified_at <= now, "verified_at regressed the clock");
+            assert!(want.revoked_at <= now, "revoked_at regressed the clock");
+        }
+        let (status, flags, at, impl_, registrar, revoked, reason) = registry.get_record(UNKNOWN);
+        assert_eq!(registrar, Address::ZERO, "unknown token must read no-record");
+        assert_eq!(status, 0);
+        assert_eq!(flags, U256::ZERO);
+        assert_eq!((at, revoked), (0, 0));
+        assert_eq!(impl_, Address::ZERO);
+        assert_eq!(reason, B256::ZERO);
+    }
+
+    #[derive(Clone, Debug)]
+    enum Op {
+        Verify,
+        Revoke,
+        Transfer,
+    }
+
+    #[derive(Clone, Debug)]
+    struct Action {
+        sender: Address,
+        op: Op,
+        token: Address,
+        flags: U256,
+        impl_: Address,
+        reason: String,
+        new_registrar: Address,
+        dt: u64,
+    }
+
+    fn action() -> impl Strategy<Value = Action> {
+        (
+            0u8..3,                    // sender pool index
+            0u8..3,                    // op
+            prop::bool::ANY,           // token A or B
+            any::<u64>(),              // risk flags
+            arb_addr(),                // impl pointer
+            "[a-z]{1,10}",             // revoke reason
+            arb_addr(),                // transfer target
+            0u64..1_000,               // clock advance
+        )
+            .prop_map(
+                |(sender_i, op_i, token_b, flags, impl_, reason, new_registrar, dt)| Action {
+                    sender: match sender_i {
+                        0 => REGISTRAR,
+                        1 => OTHER,
+                        _ => const { Address::new([0x77; 20]) },
+                    },
+                    op: match op_i {
+                        0 => Op::Verify,
+                        1 => Op::Revoke,
+                        _ => Op::Transfer,
+                    },
+                    token: if token_b { TOKEN_B } else { TOKEN_A },
+                    flags: U256::from(flags),
+                    impl_,
+                    reason,
+                    new_registrar,
+                    dt,
+                },
+            )
+    }
+
+    /// Model-based sequence property — the plan's two registry invariants.
+    #[test]
+    fn registrar_authority_and_transition_rules_hold_for_arbitrary_sequences() {
+        let strat = prop::collection::vec(action(), 1..=8);
+        runner(b"vetted-step7-registry-sequences")
+            .run(&strat, |actions| {
+                let vm = TestVM::default();
+                vm.set_sender(REGISTRAR);
+                vm.set_block_timestamp(NOW);
+                let mut registry = Registry::from(&vm);
+                registry.constructor(REGISTRAR).expect("constructor");
+
+                let mut model_registrar = REGISTRAR;
+                let mut model: BTreeMap<Address, Rec> = BTreeMap::new();
+                let mut now = NOW;
+
+                for a in actions {
+                    now += a.dt;
+                    vm.set_block_timestamp(now);
+                    vm.set_sender(a.sender);
+                    let known = model.get(&a.token).cloned();
+
+                    let outcome = match a.op {
+                        Op::Verify => registry.verify(a.token, a.flags, a.impl_),
+                        Op::Revoke => registry.revoke(a.token, a.reason.clone()),
+                        Op::Transfer => registry.transfer_registrar(a.new_registrar),
+                    };
+                    let is_registrar = a.sender == model_registrar;
+
+                    match (&a.op, is_registrar) {
+                        (Op::Verify, true) => {
+                            outcome.expect("registrar verify must succeed");
+                            model.insert(
+                                a.token,
+                                Rec {
+                                    status: STATUS_VERIFIED,
+                                    flags: a.flags,
+                                    verified_at: now,
+                                    impl_: a.impl_,
+                                    registrar: a.sender,
+                                    revoked_at: 0,
+                                    reason: B256::ZERO,
+                                },
+                            );
+                        }
+                        (Op::Verify, false) => assert!(
+                            matches!(outcome, Err(RegistryError::NotRegistrar(_))),
+                            "non-registrar verify must revert NotRegistrar"
+                        ),
+                        (Op::Revoke, true) if known.is_some() => {
+                            outcome.expect("registrar revoke on a record must succeed");
+                            let mut r = known.unwrap();
+                            // The revoke rule: status/revoked_at/reason move;
+                            // the verified fields are PRESERVED, not cleared.
+                            r.status = STATUS_REVOKED;
+                            r.revoked_at = now;
+                            r.reason = stylus_sdk::crypto::keccak(a.reason.as_bytes());
+                            model.insert(a.token, r);
+                        }
+                        (Op::Revoke, true) => assert!(
+                            matches!(outcome, Err(RegistryError::NoRecord(_))),
+                            "revoke must not create rows"
+                        ),
+                        (Op::Revoke, false) => assert!(
+                            matches!(outcome, Err(RegistryError::NotRegistrar(_))),
+                            "non-registrar revoke must revert NotRegistrar"
+                        ),
+                        (Op::Transfer, true) if !a.new_registrar.is_zero() => {
+                            outcome.expect("registrar transfer must succeed");
+                            model_registrar = a.new_registrar;
+                        }
+                        (Op::Transfer, true) => assert!(
+                            matches!(outcome, Err(RegistryError::ZeroRegistrar(_))),
+                            "transfer to zero must revert"
+                        ),
+                        (Op::Transfer, false) => assert!(
+                            matches!(outcome, Err(RegistryError::NotRegistrar(_))),
+                            "non-registrar transfer must revert NotRegistrar"
+                        ),
+                    }
+
+                    assert_vm_matches_model(&registry, model_registrar, &model, now);
+                }
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    /// The J3 read primitive: total, never reverts, all-zero tuple for any
+    /// arbitrary unknown token (consumers key on registrar == 0 — wire.md).
+    #[test]
+    fn get_record_is_total_and_zero_for_arbitrary_unknown_tokens() {
+        runner(b"vetted-step7-registry-get-record")
+            .run(&arb_addr(), |token| {
+                let vm = TestVM::default();
+                vm.set_sender(REGISTRAR);
+                let registry = Registry::from(&vm);
+                let (status, flags, at, impl_, registrar, revoked, reason) =
+                    registry.get_record(token);
+                assert_eq!(registrar, Address::ZERO);
+                assert_eq!(status, 0);
+                assert_eq!(flags, U256::ZERO);
+                assert_eq!((at, revoked), (0, 0));
+                assert_eq!(impl_, Address::ZERO);
+                assert_eq!(reason, B256::ZERO);
+                Ok(())
+            })
+            .unwrap();
     }
 }

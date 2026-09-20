@@ -17,9 +17,18 @@ alloy-sol-types = { version = "1.5.7", default-features = false }
 # Enables stylus_sdk::testing (native TestVM) for unit tests only; the feature
 # does not reach the wasm build (resolver 2 keeps dev-dep features separate).
 stylus-sdk = { version = "0.10.9", features = ["stylus-test"] }
+# Property (fuzz) suite — native-test only, never reaches the wasm32 build.
+proptest = "1"
 
 [features]
 export-abi = ["stylus-sdk/export-abi"]
+# DECLARED, never enabled: the sdk's proc macros emit
+# `#[cfg(not(feature = "contract-client-gen"))]` gates into this crate's code,
+# and rustc's unexpected_cfgs check wants every referenced value declared.
+# Declaring it changes no generated code; enabling it is for cross-contract
+# client generation, which this crate does not use. (Step-7 quality pass:
+# silences the 8 unexpected-cfg warnings in this lib target.)
+contract-client-gen = []
 
 # cargo stylus export-abi runs this bin (with the feature) to print the
 # Solidity interface — "a bin target must be available for cargo run".

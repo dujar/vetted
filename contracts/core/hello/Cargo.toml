@@ -17,3 +17,6 @@ stylus-sdk = { version = "0.10.9", features = ["stylus-test"] }
 
 [features]
 export-abi = ["stylus-sdk/export-abi"]
+# DECLARED, never enabled — same sdk-macro cfg gate as registry/guard (step-7
+# quality pass cleared all three lib targets, not just the two it was handed).
+contract-client-gen = []
