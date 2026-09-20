@@ -584,9 +584,9 @@ impl From<U256> for AbiWord {
 /// embed a different beacon at the same shape, and the joint fingerprint
 /// with step 4 stays shape-based (plan Revised note 2a).
 ///
-/// ponytail: linear 16-byte-window scan over full code (283-byte genuine
-/// forwarders; big code = more ink) — if a real token's code ever made this
-/// hot, prefix-scan only the first 512 bytes.
+/// Cost: one linear scan over the token's own code. Genuine forwarders are
+/// 283 bytes, so the scan is unmeasurable in practice; a pathological
+/// large-code token only costs ink proportional to its own code size.
 fn extract_beacon_from_code(code: &[u8]) -> Option<Address> {
     let mut i = 0usize;
     while i + 33 <= code.len() {
