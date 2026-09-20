@@ -2,7 +2,7 @@
 
 status:     merged (main 25a1bf3 via --no-ff; review round 2 APPROVED — both round-1 blockers fixed as prescribed, non-blocking notes taken; full suite green on merged main: contracts 30+2+14, scan-backend 40+5, shared 21+4+4, frontend 84 + build, e2e 28 passed + 3 activation-gated skips)
 branch:     step-9-demo-harness (off main 8648efc; merged, pushed)
-reconciled:
+reconciled: 2026-09-21 (folded into plan 10 — commit aecd05a, Revised note 6; record: reconciliation/2026-09-21-step-9-findings.md; judge round 5 2026-09-21: SHIPPABLE, 0 gaps)
 deployed:   not deployed — unfunded regime (operator key 0 wei on 4663/421614, re-checked 2026-09-21); tasks 1–5 built + rehearsed, task 6 staged (go-list below)
 
 ## Review round 1 (2026-09-21) — 2 blocking, both fixed; dispositions

@@ -48,7 +48,13 @@ so step 9's plan is a record and was not touched. Step 10's Resources block alre
 
 ## Judge
 
-No spawn tool in this context — plan-judge-agent must be dispatched by the caller (one round,
-fed this record + the step-10 diff). **Stamp withheld:** `reconciled:` on step-9 findings stays
-empty until the judge rules, per the standing pattern (step-7's stamp was also applied
-post-verdict).
+No spawn tool in this context — plan-judge-agent was dispatched by the caller. **Round 5
+(2026-09-21, on commit aecd05a): SHIPPABLE, 0 gaps** — all four items trace to note-6 lines
+with live triggers and resolvable targets; step 10 executes in both funding regimes; the five
+step-10 verify prescriptions (LE 1–5) compose with note 6 without contradiction (full text:
+`../plan-judgment.md`, round 5). Stamp applied to step-9 findings on this ruling.
+
+One caveat carried in the judgment, no plan line wrong today: if the coordinator's LE-5
+decision lands on the SCRUB branch (repo made private pre-submission), the package's link to
+step-9 findings (P receipt) dies with `.agent-workbench/**` — the LE-5 pass should copy the
+receipt into `submission/**` instead of linking the workbench path.
