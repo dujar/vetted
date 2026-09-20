@@ -267,6 +267,10 @@ the degraded branch is pre-written copy, never improvised, never fabricated.
 | **total** | **4:30 (+0:30 buffer)** | | |
 
 `demo/arc.sh` prints per-beat wall-clock to paste into this table.
+Unfunded-regime actual (anvil rehearsal, 2026-09-21): the upgrade beat's
+on-chain leg — `upgradeTo` broadcast→receipt + the implementation read — ran
+**0.3s** on local anvil (`demo/arc.sh --anvil-rehearsal`); live beat-6 total
+= this + the drift-check + refusal legs, measured at task 6 on 4663.
 
 ## 6. Failure appendix
 
