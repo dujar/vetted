@@ -103,9 +103,21 @@ send() { # send KEY WHAT TO SIG ARGS...  (empty SIG = plain ETH transfer)
 
 record_status() { # token → 0 VERIFIED / 1 REVOKED / "" no record
   if [ "$DRY_RUN" = "1" ]; then echo ""; return 0; fi
-  local rec
-  rec=$(cast call "$REGISTRY" "getRecord(address)(uint8,uint256,uint64,address,address,uint64,bytes32)" "$1" --rpc-url "$RPC" 2>/dev/null || echo "")
-  rec="${rec#\(}"; echo "${rec%%,*}"
+  # raw getRecord — no tuple-decode dependency on cast's formatting
+  # (seed-scratch's tuple grep was never executed; this shape-checks instead:
+  # 7 words × 64 hex; word0 = status, word4 = registrar)
+  local rec status_word reg_word status
+  rec=$(cast call "$REGISTRY" "getRecord(address)" "$1" --rpc-url "$RPC" 2>/dev/null || echo "0x")
+  [ "${#rec}" -eq 450 ] || { echo ""; return 0; }
+  status_word=$(printf '%s' "$rec" | cut -c3-66)
+  reg_word=$(printf '%s' "$rec" | cut -c259-322)
+  # zeroed tuple = no record (wire.md: zero registrar decodes to no-record)
+  if [ "$reg_word" = "0000000000000000000000000000000000000000000000000000000000000000" ]; then
+    echo ""; return 0
+  fi
+  status=$(printf '%s' "$status_word" | sed 's/^0*//')
+  [ -n "$status" ] || status=0
+  if [ "${#status}" -le 15 ]; then echo "$((16#$status))"; else echo "?"; fi
 }
 
 log "chain $CHAIN — registry $REGISTRY · guard $GUARD"
@@ -124,7 +136,13 @@ fi
 # 2. verify(replica) — registrar-signed (the handoff key, Revised note 2).
 log "2. registry: verify(replica $REPLICA)"
 ST=$(record_status "$REPLICA")
-if [ "$ST" != "0" ]; then
+if [ "$ST" = "1" ]; then
+  echo "replica record is REVOKED — registry transitions are monotone, it cannot re-verify." >&2
+  echo "Recovery (runbook §6): re-deploy the replica cast for a fresh proxy, re-point" >&2
+  echo "deployments/4663.json .replicas, re-run this script." >&2
+  exit 1
+fi
+if [ -z "$ST" ]; then
   IMPL=$(call "beacon implementation()" "$REPLICA_BEACON" "implementation()(address)")
   send "$REGISTRAR_KEY" "verify(replica)" "$REGISTRY" "verify(address,uint256,address)" "$REPLICA" 0 "$IMPL"
 else
