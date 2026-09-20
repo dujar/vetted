@@ -2,8 +2,9 @@
   "name": "vetted-scan-backend",
   "url": "https://vetted-scan-backend.dujar-coding.workers.dev",
   "status": "deployed",
-  "deployedAt": "2026-09-12",
-  "commit": "030301c",
-  "check": "GET /health -> {\"ok\":true} (live-probed 2026-09-12)",
-  "note": "step-1 hello scaffold; step 4 ships the real verdict engine on this worker"
+  "deployedAt": "2026-09-20",
+  "commit": "559344c",
+  "version": "0ccf8c68-cf76-4a17-842e-4fb3ee07e752",
+  "check": "GET /health -> {\"ok\":true}; GET /watchdog?chainId=4663 -> degrade sentinel {runs:0,baselinePerDay:150,provenanceUrl:docs.robinhood.com} (live-probed 2026-09-20); GET /scan?chainId=4663 under shared-egress rate limiting behaves exactly as designed: RPC_RETRYABLE transient or honest UNVERIFIED + advisory rows, never fabricated evidence. VERIFIED-shaped P receipt pending a calm rate window — one run of BASE_URL=https://vetted-scan-backend.dujar-coding.workers.dev scan-backend/scripts/live-check.sh finishes it (see step-4 findings)",
+  "note": "step-4 verdict engine replaces the hello scaffold. Cron */15 (drift-check) active; REGISTRAR_KEY/DRIFT_ADMIN_SECRET intentionally unset until step-7's registrar handoff — drift-check reports skipped:registrar_key_not_configured"
 }

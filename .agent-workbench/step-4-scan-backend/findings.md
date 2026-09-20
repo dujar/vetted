@@ -1,8 +1,8 @@
 # Step 4 — scan backend (verdict engine, watchdog, drift-revoke)
 
-status:     ready-to-merge
+status:     merged
 branch:     step-4-scan-backend
-deployed:   PRE-FIX bundle live at https://vetted-scan-backend.dujar-coding.workers.dev (deployed 2026-09-20 from merged main ebaa61c, version 34d865dd; redeploy required after the probe-evidence fix below merges)
+deployed:   https://vetted-scan-backend.dujar-coding.workers.dev — main 559344c, worker version 0ccf8c68 (2026-09-20); /health + /watchdog live-green; P-VERIFIED receipt pending a calm rate window (below)
 branch:     step-4-scan-backend
 deployed:   PRE-FIX bundle live at https://vetted-scan-backend.dujar-coding.workers.dev (deployed 2026-09-20 from merged main ebaa61c, version 34d865dd; redeploy required after the probe-evidence fix below merges)
 
@@ -53,6 +53,30 @@ shared TS 18, `cargo check --target wasm32-unknown-unknown` clean.
   `record: null` and degrades to canonical-fetch-only rules (deliberate, verify loose end 1).
 - Signing recipe landed as compiled-and-tested in-crate (`signer.rs`: EIP-1559 sync-sign + recover,
   revoke encoding carries the pinned selector); the `scripts/registrar-cli` fallback never triggered.
+
+## Live receipt outcome (2026-09-20, post round-3 merge 559344c)
+Deployed version 0ccf8c68 runs the fixed engine. Live-probed: /health green; /watchdog degrade
+sentinel exact (runs:0 + provenanceUrl + 150/day — the sentinel, never a measured zero); /scan
+under the 4663 RPC's shared-egress rate limit behaves exactly as designed — `RPC_RETRYABLE`
+transient, or completed-but-dropped-probes → honest UNVERIFIED + advisory rows with ZERO
+fabricated evidence (the fix verified live in its honest direction). **Pending:** one
+VERIFIED-shaped P receipt — it needs all ~6 reads inside one scan to land in a calm window.
+10 spaced attempts over ~30 min: 0 full passes, 1 full pass observed pre-fix (windows are real
+but rare). Finish it any time with:
+`BASE_URL=https://vetted-scan-backend.dujar-coding.workers.dev ./scan-backend/scripts/live-check.sh`
+FOR STEP 9 (demo harness): build scan retries into the journey scripts; if the 4663 public RPC
+keeps throttling Cloudflare egress, a paid/private RPC endpoint for the demo window is the
+upgrade path (ponytail: single-flight elided, 30s in-isolate TTL only — rpc.rs:5). Local
+`wrangler dev` (alternative egress) crashes in workerd in this sandbox — not a code issue.
+
+## Review round 3 (2026-09-20) — APPROVED, 0 blocking (probe-evidence fix)
+Trichotomy verified honest (failed read → None → no rows + honest UNVERIFIED; definitive revert
+→ real ABSENT evidence; answered → PRESENT); all three paths pinned by tests; scope exactly the
+4 declared files. R3-N1 (non-blocking, pre-existing): blocklist accepts any Ok(_) as answered —
+an empty success would render PRESENT without a decodable bool; conservative direction
+(over-warns), fold a decode_abi_bool check in whenever fingerprint.rs is next touched.
+R3-N2 (non-blocking): the undecodable-paused→None and beacon-None→None branches are unpinned by
+tests; trivial to add next time the suite is touched.
 
 ## Post-merge live receipt — probe-evidence bug FOUND and FIXED (2026-09-20)
 The approved code merged to main (ebaa61c) and deployed cleanly, but the plan's own live check
