@@ -1,9 +1,9 @@
 # demo/video-script.md — the 5-minute take, 1:1 with the runbook beats
 
 Recorded from a live run of `demo/runbook.md` after task 6's dry runs are
-green — never from a staged state, never over a degraded take. **The product
-name must be locked before recording** (plan open question; the wordmark is
-one file, `frontend/src/lib/brand.ts`). Recording checklist: OBS 1920×1080
+green — never from a staged state, never over a degraded take. The product
+name is LOCKED ("Vetted" — coordinator lock, tracker fc8b004 2026-09-21;
+wordmark: `frontend/src/lib/brand.ts`). Recording checklist: OBS 1920×1080
 60fps; fresh browser profile with the funded operator wallet; console pane
 visible from beat 6 (the upgrade is driven there); full take, then per-beat
 clips cut at the §5 beat boundaries; `demo/demo.gif` for the README comes
@@ -93,7 +93,7 @@ manual drift-check POST, then the scan, then the swap)*
 > never guesses — and where it verified, it enforces."
 
 ## Pre-flight read-through (bind at recording)
-- [ ] Product name locked (open question — recording waits).
+- [x] Product name locked: "Vetted" (tracker fc8b004, 2026-09-21).
 - [ ] No "trust layer", no "first coverage" — GoPlus lists 4663; the line
   is coverage-without-enforcement vs. enforcement (knowledge/goplus-api.md).
 - [ ] Twin never implied IMPOSTOR on the live engine; mock fixtures labeled
