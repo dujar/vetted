@@ -47,4 +47,10 @@ Ground truth verified before editing (all on origin/main f10787e): `scripts/depl
 
 No spawn tool in this context — plan-judge-agent must be dispatched by the caller (round logged as `reconcile-2026-09-20`).
 
-**Verdict: PENDING.** `reconciled:` stamps are withheld on all three findings files until the judge rules; this round's edits stand as the Revised notes in the four plans above.
+**Judge round 1 (2026-09-20, plan-judgment.md:83–106): 2 gaps — 1 substantive, 1 minor; the reconciliation itself ruled faithful** (every listed item traces to a plan line, dependency order sound, writer correction consistent in all three places, no 7-vs-8 write collisions, spec's v1 cut fully planned).
+
+**Gap fixes (this commit, per the verdict's own prescription — non-structural, no replanning needed):**
+1. Worker `REGISTRY_ADDRESS_{4663,46630,421614}` fill was unowned (read at `scan-backend/src/lib.rs:107–109`, empty in `wrangler.toml:13–15`; step-4 findings assigned it to "step 3/7 deploys" but no task named it). Fixed: step-7 Revised note 3 + task 5 set `REGISTRY_ADDRESS_4663` from `deployments/4663.json` immediately after the 4663 deploy; step-8 gained Revised note 4 + a task-5 clause filling the scratch pair (`46630`/`421614`) from the funded `deployments/*.json` before the live pass.
+2. Step-8 Scope line ("e2e/** only") contradicted Revised note 1 + task 4 editing `frontend/src/lib/api.ts`. Fixed: Scope line amended to carry the one-file exception (type field only, no behavior change), and the tracker's step-8 files-in-scope cell amended to match — that single-cell tracker edit is the only change to `step-feature-state.md` (judge-directed; statuses, Next block, and the plan-judge header untouched).
+
+`reconciled:` stamps on step-3/4/6 findings remain withheld pending coordinator acceptance — the judge's Stamps section pre-authorizes dating them on this ruling (`reconciled: 2026-09-20`). Stamping note: all three findings files should be stamped at their canonical main copies (`.agent-workbench/step-{3,4,6}-*/findings.md`); step-4's `/tmp/step4-wt` worktree copy was diffed identical to main's this round, so main's stamp covers it and the worktree stays prunable.
