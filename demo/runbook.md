@@ -95,8 +95,9 @@ beats from it.
       `DRIFT_ADMIN_SECRET` (never on camera, never committed).
 - [ ] OBS: 1920×1080, 60fps, mic check; scene = browser + console split (the
       console is part of the story — the upgrade beat is driven there).
-- [ ] **Product name locked** (the open question — recording waits on it;
-      the frontend wordmark is `frontend/src/lib/brand.ts`, one file).
+- [x] **Product name locked: "Vetted"** (coordinator lock, tracker fc8b004
+      2026-09-21; wordmark lives in `frontend/src/lib/brand.ts` — resolved,
+      recording is no longer name-blocked).
 - [ ] Optional calm-window probe: `BASE_URL=https://vetted-scan-backend.dujar-coding.workers.dev ./scan-backend/scripts/live-check.sh`
       — a VERIFIED-shaped P receipt here doubles as beat 2's green light
       (spaced attempts; plan Revised 2026-09-20 note 2).

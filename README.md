@@ -1,4 +1,4 @@
-# vetted_ (placeholder name — locked by the coordinator before demo recording)
+# Vetted
 
 Token verification + guarded swap for Robinhood Chain stock tokens. Paste any
 token address on Robinhood Chain (4663) and get an evidence-linked verdict —
@@ -11,6 +11,48 @@ links its evidence.
 
 Built for the Arbitrum Open House Singapore Online Buildathon (deadline
 2026-10-04 23:59 SGT). **Judged-criteria mapping:** `docs/criteria.md`.
+
+## Security note — read before trusting a swap
+
+**Disclosure: the guard's ERC-20 check decodes any `true`-ish returndata**
+(`contracts/core/guard/src/lib.rs:497`). The `erc20()` helper treats *any*
+return payload whose 31st byte is set as a boolean `true` — a malicious token
+can return junk (e.g. 64 arbitrary bytes) that decodes as "approved", so the
+commit-custody `transferFrom` can silently not move funds into escrow for a
+token that lies this way. **Worst case: a phantom active order for the buyer
+who chose that token — the later `execute()` then reverts whole, and no funds
+move.** It cannot steal or strand a counterparty's funds; the failure is
+visible as a reverted swap. Found in review, disclosed here, and deliberately
+not patched at the release freeze (a decode tightening is a behavior change;
+product code is frozen except blocking fixes). It is first on the Q&A list in
+[`submission/qa-prep.md`](submission/qa-prep.md).
+
+**Known limits — what the live URLs actually show:**
+
+- **Depth boundary, stated in the UI:** full verdicts require a signature
+  match on the known Robinhood stock-token pattern; every other contract gets
+  UNVERIFIED plus labeled advisory heuristics. The tool never claims to scan
+  any token deeply, and never guesses.
+- **Watchdog widget ships the degrade sentinel by design** (`runs: 0` +
+  `provenanceUrl` means "count unavailable", never a measured zero): no L1
+  read reconciles with the published six-week figures yet, so the widget
+  compares against the published ~150/day baseline and the measured figures
+  (with provenance) live in the demo narration and `docs/threats.md`.
+- **Gas actuals are PASS-PENDING-FUNDS** (`docs/gas-report.md`): sizes,
+  data fees and the receipt methodology are committed (§3); the per-row
+  `gasUsed` table (§4) is filled only by the first funded run's receipts —
+  the receipts are never invented.
+- **Registry revocation drill-in can show "not indexed yet"**: `/scan`
+  attaches the revocation tx from Revoke logs; the registry table's UI data
+  path does not yet — a stated indexing gap, never claimed as live evidence.
+- **Unfunded-regime items (pending one funded operator run —**
+  [`submission/post-funding-checklist.md`](submission/post-funding-checklist.md**):**
+  the 4663 core contract deploy + `deployments/4663.json`, the frontend live
+  env (`VITE_REGISTRY_ADDRESS` / `VITE_GUARD_ADDRESS`), the one-worker
+  registrar/drift handoff, and the VERIFIED-shaped live scan receipt. The
+  demo arc, contracts, engine and harness are complete and rehearsed; the
+  gas report and this note carry the honest PENDING markers until the run
+  lands (go/no-go 2026-09-29).
 
 ## Architecture
 

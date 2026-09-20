@@ -1,7 +1,7 @@
 /**
- * Product name — still the "Vetted" placeholder (plan open question; the
- * coordinator picks the final name at screens phase). Every user-facing
- * mention imports from here so renaming is mechanical.
+ * Product name — "Vetted", LOCKED by the coordinator (tracker fc8b004,
+ * 2026-09-21). Every user-facing mention imports from here so renaming
+ * stays mechanical if a rebrand is ever sanctioned.
  */
 export const PRODUCT_NAME = "Vetted";
 /** Header wordmark, lowercase with cursor — per the mockups' `vetted_`. */
