@@ -18,7 +18,7 @@ No epics ledger — v1 planned directly from the approved spec.md.
 | 7    | 3     | contract-hardening | step-7-contract-hardening/    | done    | 3          | Sep 27–29           | contracts/core tests+docs only, docs/, gas report, 4663 core deploy |
 | 8    | 3     | e2e-journeys       | step-8-e2e-journeys/          | done    | 3, 4, 5, 6 | Sep 27–30           | e2e/** (+ one-file exception: frontend/src/lib/api.ts WatchdogStats.provenanceUrl fold-in — judge round-4 gap 2) |
 | 9    | 3     | demo-harness       | step-9-demo-harness/          | done    | 7, 8       | Oct 1–2             | demo/**, scripts/seed-demo/ |
-| 10   | 3     | deploy-submission  | step-10-deploy-submission/    | planned | 7, 9       | Oct 3 (submit; close 10-04 23:59 SGT) | deploy orchestration, submission/**, release tag |
+| 10   | 3     | deploy-submission  | step-10-deploy-submission/    | done    | 7, 9       | Oct 3 (submit; close 10-04 23:59 SGT) | deploy orchestration, submission/**, release tag |
 
 Status vocabulary: `planned` / `done` / `blocked` — nothing else. The caller writes status rows from builder reports; this file is rewritten whole by plan-agent, carrying all statuses forward.
 
