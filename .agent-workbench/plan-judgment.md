@@ -104,3 +104,31 @@ With this ruling the `reconciled:` stamps on step-3/4/6 findings may be dated. T
 ## Verdict
 
 2 gaps (1 substantive, 1 minor). The reconciliation itself is faithful — every named item landed where the record claims, the writer correction is consistent everywhere it appears, and ordering/collisions hold. Gap 1 is the one that would have surfaced mid-build with the plan already trusted.
+
+---
+
+# Round 4 (2026-09-21) — reconciliation of steps 7+8 findings into plans 9–10 (commit ef21e2b)
+
+Set judged: plans 9–10 as amended by ef21e2b, against `reconciliation/2026-09-21-steps-7-and-8-findings.md`, step-7 findings (93201ab) and step-8 findings (b17fdd3), the tracker, and spec.md. Steps 1–8 done; 9 and 10 planned. Ground truth re-verified live on main ef21e2b: `e2e/scripts/seed-scratch.sh` is `bash -n` clean; `e2e/README.md:41` is the activation runbook; the J3 empty-state unit pin exists at `frontend/tests/registry.test.tsx:76–79`; all four worker vars are empty at `scan-backend/wrangler.toml:13–21` incl. `DRIFT_EXTRA_TOKENS`; `deployments/` has no chain JSON; the funded-run runbook (7 steps, incl. the `REGISTRY_ADDRESS_4663 --var` pass at findings :109–113) is in step-7 findings :66–160.
+
+## What holds
+
+1. **Every carried item traces to a plan line.** Funded-run runbook as step-9 prerequisite → step-9 plan.md:10 (learned), :23 (Revised note 1), :51 (task 6 "Prerequisite: … has executed"). seed-scratch.sh inheritance (parse-fixed, never executed, `bash -n` clean) → step-9 :26 (note 4) + :46 (task 1 ports the two-sided swap-settle plumbing). Activation-gated e2e skips' path → step-9 :26 (e2e/README.md:41 runbook, live project once post-runbook as the regression check). Stale runbook-text correction (process carry 5) → step-9 :25 (note 3: "the runbook text 'step 8 re-passes' is stale … first real pass is the runbook's"). J3 empty-state narration honesty → step-9 :27 (note 5). Dead-helpers freeze note → step-10 :24 (note 4) + :42 (task 1). Registrar-key/drift-secret facts → step-9 :24 (note 2) + :48 (task 3); DRIFT_EXTRA_TOKENS ownership + `--var` gotcha → step-9 :25 + :48, audited step-10 :22 + :43. Writer-of-record + vars-audit + verify-not-re-run → step-10 :21–23 + :43.
+2. **Dependency order coherent.** 9 depends on 7,8 — both done. 10 depends on 7,9 — 9 still planned, so 10 correctly waits. No cycles, no forward references beyond the by-design `learned: ../step-9-demo-harness/findings.md` in step-10's Resources (unwritten until 9 merges). Round-3 gap 1 (worker vars fill unowned) is now closed: runbook 6c owns the first pass (step-7 findings :109–113), step-9 note 3 owns re-passes, step-10 note 2 audits what IS set. Round-3 gap 2 (tracker step-8 scope column) is fixed in the tracker row ("+ one-file exception").
+3. **Step 9 is executable in both regimes — with one wording snag (gap 2).** Funded: runbook executes (any builder, no build work — note 1), then tasks 1–6 build and task 6 dry-runs as the first full 4663 journey pass. Unfunded: tasks 1–5 (seed scripts, runbook/arc.sh text, upgrade-beat scripting, video script, README) have no funding dependency in their text; task 6's explicit prerequisite + note 4's live-e2e flip are the staged gates. Dispatch is safe in either regime.
+4. **Spec's submission requirements fully planned across 9+10** (except gap 1's disclosure): video script + recording → 9 task 4, final video in package → 10 task 5; README/quickstart/criteria-link/demo-gif/cast-labeling → 9 task 5; repo hygiene + freeze + tag + CI-at-tag + clean-checkout build → 10 task 1 + scope line; pre-submission checklist (spec.md:71: Token Sniffer/De.Fi spot-check, EAS + GoPlus rehearsal) → 10 task 4; package upload with ≥24h buffer (2026-10-03 EOD target) → 10 task 5; live URLs + contract addresses → 10 tasks 2/5 + Check line; Q&A residual risks (spec.md:79–80) → 10 task 6. Journeys stay reachable: J1/J2/J3 green, the 3 activation-gated skips get their activation path in step-9 note 4.
+5. **erc20() junk-decode — decision received, not yet landed (gap 1).** Verified real in step-7 findings :148–152 ("Out of scope, left broken"); grep of both plans returns zero hits for erc20/junk/security.
+
+## Gaps
+
+[gap] The coordinator's erc20() junk-decode decision (carry to judges' Q&A + prominent security-note disclosure in step-10's submission docs; NOT a sanctioned contracts change) exists nowhere in the plans — step-10 task 6's residual-risk list names only spec.md:79/80 and task 5's submission package has no security-note slot, so a freeze-time builder would submit without the one disclosure the coordinator has ordered — belongs in step-10 (before any step-10 dispatch) — smallest fix: one clause in task 6 adding the guard `erc20()` junk-returndata item to the Q&A list (cite step-7 findings.md:148–152, worst case: phantom active order for a lying token's buyer, execute reverts whole, funds safe) and one clause in task 5 adding the prominent security-note to the submission docs/README.
+
+[gap, minor] Step-9 Revised note 1's header "the funded-run runbook executes at or before this step's start" contradicts the unfunded dispatch regime the coordinator intends — a literal builder dispatched before funding reads it (plus the record's escalation 1 "gates step 9's start") and stalls instead of starting tasks 1–5, whose text is funding-free; task 6's prerequisite is the operative gate and already says the right thing — belongs in step-9 note 1 (before dispatch) — smallest fix: reword the header to gate task 6's dry runs explicitly, e.g. "executes before the first dry run (task 6); non-chain tasks 1–5 proceed unfunded."
+
+## Stamps
+
+With this ruling the withheld `reconciled:` stamps may be dated: step-8 findings.md:5 has the empty line awaiting its date; step-7 findings.md has no `reconciled:` line at all — add one. Tracker needs no change for these gaps (both fixes are plan-text clauses; statuses stay 9/10 planned).
+
+## Verdict
+
+2 gaps (1 substantive, 1 minor). The reconciliation is faithful — all carried items trace to plan lines, the dependency graph is true, round-3's gaps are closed, and the two-regime dispatch works. Both fixes are single-clause plan edits; once applied, the set ships: steps 9 then 10 reach the spec's success line with the submission package, freeze, and disclosures complete.
