@@ -12,7 +12,7 @@ No epics ledger — v1 planned directly from the approved spec.md.
 | 1    | 1     | repo-scaffold      | step-1-repo-scaffold/         | done    | —          | Sep 12–13           | repo root, CI, packages/shared/, frontend scaffold+tokens/primitives, toolchain docs, deployments/ layout |
 | 2    | 1     | spike-gate         | step-2-spike-gate/            | done    | 1          | Sep 12–18 (gate 9-18; merged 9-19) | spike/**, spike/findings.md + one merge-time append: packages/shared/abi.ts PROBE_SELECTORS block |
 | 3    | 2     | contracts-core     | step-3-contracts-core/        | planned | 1, 2       | Sep 19–26           | contracts/core/**, scripts/deploy/core/, deployments/*.json (append) |
-| 4    | 2     | scan-backend       | step-4-scan-backend/          | planned | 1, 2       | Sep 19–26           | scan-backend/** |
+| 4    | 2     | scan-backend       | step-4-scan-backend/          | done    | 1, 2       | Sep 19–26           | scan-backend/** |
 | 5    | 2     | frontend-screens   | step-5-frontend-screens/      | done    | 1          | Sep 13–24 (starts parallel with step 2) | frontend/src/pages, frontend/src/lib, frontend tests |
 | 6    | 2     | replica-assets     | step-6-replica-assets/        | done    | 1, 2       | Sep 19–26           | contracts/replicas/** (own foundry project), scripts/deploy/replicas/, demo/assets.md |
 | 7    | 3     | contract-hardening | step-7-contract-hardening/    | planned | 3          | Sep 27–29           | contracts/core tests+docs only, docs/, gas report, 4663 core deploy |
