@@ -1,0 +1,19 @@
+{
+  "name": "vetted-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "npm ci --prefix ../frontend --no-audit --no-fund && npm ci --prefix ../packages/shared --no-audit --no-fund",
+    "test": "playwright test",
+    "test:mock": "playwright test --project=mock",
+    "test:live": "playwright test --project=live",
+    "seed:scratch": "bash scripts/seed-scratch.sh"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.2",
+    "vetted-shared": "file:../packages/shared",
+    "viem": "^2.56.3"
+  }
+}

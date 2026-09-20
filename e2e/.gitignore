@@ -1,0 +1,9 @@
+# Playwright artifacts
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# Written by scripts/seed-scratch.sh when a funded scratch run seeds demo state —
+# machine-local, never committed.
+.scratch-state.json
