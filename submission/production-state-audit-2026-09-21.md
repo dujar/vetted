@@ -1,4 +1,18 @@
-# production state audit — 2026-09-20 21:36:10 UTC
+# Production state audit — step-10 task 2, recorded 2026-09-21 (SGT; 21:36 UTC)
+
+Unfunded regime at step-10 start: the operator key reads 0 wei on
+4663/46630/421614, so every funded-run artifact is PENDING-FUNDS and the
+audit's live checks cover what exists without chain state. Re-run with
+`bash scripts/release/production-check.sh` after the go-list — every line
+must then read PASS or a justified N/A
+(`submission/post-funding-checklist.md` step 2). The WARN on the secrets
+audit is a checkout limitation (no wrangler deps in this worktree), not a
+worker finding: REGISTRAR_KEY/DRIFT_ADMIN_SECRET ship deliberately unset
+until the registrar handoff (plan Revised 2026-09-20 note 1).
+
+---
+
+# raw script output — 2026-09-20 21:36:10 UTC
 # key 0x151e9f57F31310aFeBBB60c222c14badCf938E4C · regime-aware (PENDING-FUNDS = the funded run hasn't executed)
 
 PENDING-FUNDS | deployments/4663.json absent — go-list (submission/post-funding-checklist.md §1) not executed yet
