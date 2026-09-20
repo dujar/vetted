@@ -45,6 +45,41 @@
 //! `commit(address,address,uint256,uint256)` → 0x498ab631, `execute()` →
 //! 0x61461954. Internal escrow invariants revert with dedicated
 //! `Escrow*` errors — the five pinned strings stay reserved for red flags.
+//!
+//! # Security considerations
+//!
+//! The full model (reentrancy walk-through, adversarial-token table, the
+//! deliberate fail-closed/fail-open split, MM-key trust, error taxonomy,
+//! chain assumptions) is `docs/threats.md` §4; the contract facts behind it:
+//!
+//! - **Checks vs effects, both directions.** `commit` stores the order
+//!   before taking custody (a reentrant token sees an active escrow, and
+//!   any failure rolls the whole tx back); `execute` deactivates before
+//!   probing and settling (reentrancy finds no active order). All probes
+//!   are STATICCALLs — they cannot mutate state even on attacker code.
+//! - **Deliberate failure split.** The registry read fails CLOSED (a
+//!   registry that will not answer stops the swap — the record is the
+//!   safety-critical input); live probes fail OPEN (degrade to "no flag",
+//!   heuristics never revert — spec discipline, and it denies probe-weirdness
+//!   griefing). The impl-vs-record check only reverts when resolution
+//!   SUCCEEDS and disagrees; an unresolved beacon is skipped, never guessed.
+//! - **No arithmetic on user values.** `amountIn`/`minOut` move verbatim
+//!   (exact escrow, exact release — a fee-on-transfer token reverts the
+//!   whole swap rather than stranding a partial escrow); no slippage math,
+//!   no oracle, no U256 arithmetic beyond zero checks.
+//! - **Strict token calls.** Revert data passes through untouched
+//!   (`TokenCallFailed`), an explicit `false` reverts (`TokenTransferFailed`),
+//!   and empty returndata is accepted — no error path is swallowed, so
+//!   every failure unwinds to zero movement.
+//! - **Error taxonomy.** The five pinned red-flag strings (byte-exact,
+//!   rendered by the frontend) are reserved for red flags; escrow and token
+//!   invariants use dedicated `SolError`s — the full revert-site table is
+//!   `docs/threats.md` §4.5.
+//! - **Gas posture.** Probes forward all gas by design (read-only, so the
+//!   63/64 rule bounds the blast radius of a gas-hungry callee); the
+//!   ≤200,000 execution budget is asserted on-chain from broadcast
+//!   receipts (deploy stage E) — the native test host does not meter EVM
+//!   gas, so no in-repo test claims a number it cannot measure.
 
 #![cfg_attr(not(any(test, feature = "export-abi")), no_main)]
 #![cfg_attr(not(any(test, feature = "export-abi")), no_std)]
@@ -1062,5 +1097,382 @@ mod test {
             GuardError::Revert(Revert { reason }) => assert_eq!(reason, "GUARD_PAUSED"),
             other => panic!("wrong variant {other:?}"),
         }
+    }
+}
+
+#[cfg(test)]
+mod fuzz {
+    //! Property (fuzz) suite — proptest over the native host (plan task 1).
+    //! Deterministic: fixed seed + 10_000 cases per property, so CI
+    //! reproduces failures bit-for-bit; proptest shrinks + persists
+    //! counterexamples under `proptest-regressions/`.
+    //!
+    //! What the native host can and cannot pin, stated plainly:
+    //! - CAN: the pure decision table (totality, the pinned priority ORDER —
+    //!   an earlier reason is never masked by a later one — and degraded
+    //!   probes never minting flags), beacon-extraction robustness on
+    //!   arbitrary bytecode, zero-storage-delta on every revert that fires
+    //!   before any write, and the calldata/word encoders (the ABI trust
+    //!   boundary).
+    //! - CANNOT: EVM gas (the stylus-test host does not meter — the
+    //!   ≤200,000 assertion lives on-chain in the deploy receipts,
+    //!   scripts/deploy/core/deploy.sh stage E) and live probe→target
+    //!   wiring past a single staticcall (the TestVM mock-bytes quirk,
+    //!   noted in `mod test` above — the receipts assert that wiring).
+    //! - Rollback of post-deactivation writes (a red flag after
+    //!   `active = false`) is EVM atomicity's job and is receipt-asserted
+    //!   on-chain (plan Revised note 4); the native host has no revert
+    //!   primitive, so no property pretends otherwise here.
+
+    use super::*;
+    use proptest::prelude::*;
+    use proptest::test_runner::{Config, RngAlgorithm, TestRng, TestRunner};
+    use stylus_sdk::testing::TestVM;
+
+    const REGISTRY: Address = const { Address::new([0x11; 20]) };
+    const MM: Address = const { Address::new([0x22; 20]) };
+    const BUYER: Address = const { Address::new([0x33; 20]) };
+    const GUARD_ADDR: Address = const { Address::new([0x99; 20]) };
+
+    /// The five pinned strings in priority order (journeys.md:32).
+    const PINNED_ORDER: [&str; 5] = [
+        GUARD_NO_RECORD,
+        GUARD_RECORD_REVOKED,
+        GUARD_PAUSED,
+        GUARD_BLOCKLISTED,
+        GUARD_IMPL_MISMATCH,
+    ];
+
+    /// Deterministic 10k-case runner: fixed ChaCha seed (proptest's
+    /// documented cross-platform-reproducible mode — same algorithm+seed,
+    /// same cases, every machine), no entropy. The label folds into the
+    /// 32-byte key ChaCha requires, so seed strings stay readable.
+    fn runner(seed: &[u8]) -> TestRunner {
+        let config = Config {
+            cases: 10_000,
+            ..Config::default()
+        };
+        let mut key = [0u8; 32];
+        for (i, b) in seed.iter().enumerate() {
+            key[i % 32] ^= b;
+        }
+        TestRunner::new_with_rng(config, TestRng::from_seed(RngAlgorithm::ChaCha, &key))
+    }
+
+    fn arb_addr() -> impl Strategy<Value = Address> {
+        (any::<u64>(), any::<u64>(), any::<u32>()).prop_map(|(hi, mid, lo)| {
+            let mut bytes = [0u8; 20];
+            bytes[0..8].copy_from_slice(&hi.to_be_bytes());
+            bytes[8..16].copy_from_slice(&mid.to_be_bytes());
+            bytes[16..20].copy_from_slice(&lo.to_be_bytes());
+            Address::new(bytes)
+        })
+    }
+
+    /// Position of a flag in the pinned priority order (None = after all).
+    fn rank(flag: Option<&'static str>) -> usize {
+        PINNED_ORDER
+            .iter()
+            .position(|p| flag == Some(*p))
+            .unwrap_or(PINNED_ORDER.len())
+    }
+
+    // ---- 1. the decision table ----
+
+    /// Totality + priority: for arbitrary inputs the output is EXACTLY the
+    /// first applicable condition of the five — never a later one, never
+    /// anything outside the pinned set. The five conditions here are a
+    /// fresh transcription of the spec order (record → revoked → paused →
+    /// blocklisted → impl-mismatch), not a call into the implementation.
+    #[test]
+    fn red_flag_is_exactly_the_first_applicable_condition() {
+        let strat = (
+            (any::<u8>(), arb_addr(), arb_addr()), // status, registrar, record impl
+            (
+                any::<bool>(),
+                any::<bool>(),
+                any::<bool>(),
+                any::<bool>(),
+                any::<bool>(),
+                arb_addr(),
+            ), // paused_ok, paused, blocked_ok, blocked, resolved?, live impl
+        );
+        runner(b"vetted-step7-guard-red-flag-order")
+            .run(&strat, |((status, registrar, rec_impl), (pok, p, bok, b, has, live))| {
+                let resolved = if has { Some(live) } else { None };
+                let out = red_flag(
+                    status,
+                    registrar,
+                    rec_impl,
+                    (pok, p),
+                    (bok, b),
+                    resolved,
+                );
+
+                let applicable = [
+                    registrar.is_zero() || status > STATUS_REVOKED,
+                    status == STATUS_REVOKED,
+                    pok && p,
+                    bok && b,
+                    matches!(resolved, Some(a) if a != rec_impl),
+                ];
+                let expected = PINNED_ORDER
+                    .iter()
+                    .zip(applicable.iter())
+                    .find(|(_, &hit)| hit)
+                    .map(|(name, _)| *name);
+                assert_eq!(
+                    out, expected,
+                    "flag must be the FIRST applicable condition, nothing else"
+                );
+                // Determinism: same inputs, same answer, every time.
+                assert_eq!(
+                    out,
+                    red_flag(status, registrar, rec_impl, (pok, p), (bok, b), resolved),
+                    "decision must be deterministic"
+                );
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    /// Degradation is one-directional: taking probe answers AWAY (a probe
+    /// that reverts, empty returndata, unresolved beacon) can only move the
+    /// verdict LATER in the pinned order or to "no flag" — it can never
+    /// surface an earlier flag, and a no-flag case can never gain one.
+    #[test]
+    fn degrading_probes_never_surfaces_an_earlier_flag() {
+        let strat = (
+            (any::<u8>(), arb_addr(), arb_addr()),
+            (any::<bool>(), any::<bool>(), any::<bool>()),
+        );
+        runner(b"vetted-step7-guard-degrade")
+            .run(&strat, |((status, registrar, rec_impl), (p, b, has))| {
+                // Arbitrary match/mismatch discriminator: the registrar
+                // address's low bit (the property does not care WHERE the
+                // arbitrariness lives, only that both cases are exercised).
+                let mismatches = registrar.as_slice()[19] & 1 == 1;
+                let resolved = if has {
+                    Some(if mismatches { Address::new([0xEE; 20]) } else { rec_impl })
+                } else {
+                    None
+                };
+                let full = red_flag(status, registrar, rec_impl, (true, p), (true, b), resolved);
+                let no_paused =
+                    red_flag(status, registrar, rec_impl, (false, false), (true, b), resolved);
+                let no_blocked =
+                    red_flag(status, registrar, rec_impl, (true, p), (false, false), resolved);
+                let none_answered = red_flag(
+                    status,
+                    registrar,
+                    rec_impl,
+                    (false, false),
+                    (false, false),
+                    None,
+                );
+                assert!(rank(full) <= rank(no_paused), "degrading paused surfaced an earlier flag");
+                assert!(rank(full) <= rank(no_blocked), "degrading blocklist surfaced an earlier flag");
+                assert!(rank(full) <= rank(none_answered), "degrading everything surfaced an earlier flag");
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    // ---- 2. beacon extraction robustness ----
+
+    /// Never panics on arbitrary bytes, deterministic, and any answer it
+    /// returns must sit at a real calibrated shape IN THE INPUT — it can
+    /// only ever return an address the code itself embeds.
+    #[test]
+    fn extraction_never_panics_and_answers_only_from_real_shapes() {
+        let strat = prop::collection::vec(any::<u8>(), 0..600);
+        runner(b"vetted-step7-guard-extract-arbitrary")
+            .run(&strat, |code| {
+                let first = extract_beacon_from_code(&code);
+                assert_eq!(first, extract_beacon_from_code(&code), "must be deterministic");
+                if let Some(addr) = first {
+                    let shape_present = code.windows(33).any(|w| {
+                        w[0] == 0x7f
+                            && w[1..13].iter().all(|&z| z == 0)
+                            && &w[13..33] == addr.as_slice()
+                    });
+                    assert!(shape_present, "returned beacon not present at a PUSH32 shape");
+                }
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    /// Constructive inverse: the calibrated shape spliced at an arbitrary
+    /// offset into shape-free filler is always accepted, for any beacon.
+    #[test]
+    fn extraction_accepts_the_calibrated_shape_at_any_offset() {
+        let strat = (arb_addr(), 0usize..96);
+        runner(b"vetted-step7-guard-extract-constructive")
+            .run(&strat, |(beacon, offset)| {
+                let mut code = alloc::vec![0x60u8; offset]; // PUSH1 filler, shape-free
+                code.push(0x7f);
+                code.extend_from_slice(&[0u8; 12]); // zero-padded PUSH32 word
+                code.extend_from_slice(beacon.as_slice());
+                code.extend_from_slice(&SEL_IMPLEMENTATION_BYTES); // the anchor
+                code.extend_from_slice(&[0x60u8; 40]);
+                assert_eq!(extract_beacon_from_code(&code), Some(beacon));
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    // ---- 3. zero storage delta on pre-write reverts ----
+
+    fn fresh_guard() -> (TestVM, Guard) {
+        let vm = TestVM::default();
+        vm.set_sender(BUYER);
+        vm.set_contract_address(GUARD_ADDR);
+        let mut guard = Guard::from(&vm);
+        guard.constructor(REGISTRY, MM).expect("constructor");
+        (vm, guard)
+    }
+
+    fn transfer_from_calldata(from: Address, to: Address, amount: U256) -> Vec<u8> {
+        calldata(
+            SEL_TRANSFER_FROM,
+            &words([from.into(), to.into(), amount.into()]),
+        )
+    }
+
+    /// commit(amount == 0): EscrowAmountZero, and nothing at all is written
+    /// — for arbitrary tokens and arbitrary zero/nonzero minOut.
+    #[test]
+    fn commit_zero_amount_rejects_with_zero_storage_delta() {
+        let strat = (arb_addr(), arb_addr(), any::<bool>());
+        runner(b"vetted-step7-guard-commit-zero")
+            .run(&strat, |(t_in, t_out, min_out)| {
+                let (vm, mut guard) = fresh_guard();
+                let before = vm.snapshot().storage.clone();
+                let res = guard.commit(t_in, t_out, U256::ZERO, U256::from(min_out));
+                assert!(matches!(res, Err(GuardError::EscrowAmountZero(_))));
+                assert_eq!(vm.snapshot().storage, before, "revert mutated storage");
+                assert!(!guard.get_order(BUYER).4, "no order may appear");
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    /// A second commit while an order is active: EscrowOrderActive, and the
+    /// FIRST order's stored bytes are untouched (an overwrite would strand
+    /// the first escrow — this fuzzes the guard against that for arbitrary
+    /// attacker-chosen replacement orders).
+    #[test]
+    fn second_commit_rejects_with_zero_storage_delta() {
+        let strat = ((arb_addr(), arb_addr(), any::<u64>()), (arb_addr(), arb_addr(), any::<u64>()));
+        runner(b"vetted-step7-guard-commit-second")
+            .run(&strat, |(first, second)| {
+                let (vm, mut guard) = fresh_guard();
+                let amount = U256::from(first.2 | 1);
+                vm.mock_call(
+                    first.0,
+                    transfer_from_calldata(BUYER, GUARD_ADDR, amount),
+                    U256::ZERO,
+                    Ok(enc_word(U256::from(1u8)).to_vec()),
+                );
+                guard.commit(first.0, first.1, amount, U256::from(first.2)).expect("first commit");
+
+                let before = vm.snapshot().storage.clone();
+                let res = guard.commit(
+                    second.0,
+                    second.1,
+                    U256::from(second.2 | 1),
+                    U256::from(second.2),
+                );
+                assert!(matches!(res, Err(GuardError::EscrowOrderActive(_))));
+                assert_eq!(vm.snapshot().storage, before, "rejected overwrite mutated storage");
+                let (t_in, t_out, amt, min_out, active) = guard.get_order(BUYER);
+                assert!(active);
+                assert_eq!((t_in, t_out, amt, min_out), (first.0, first.1, amount, U256::from(first.2)));
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    /// execute() with no order — for an arbitrary would-be buyer — reverts
+    /// EscrowNoOrder and writes nothing.
+    #[test]
+    fn execute_without_order_rejects_with_zero_storage_delta() {
+        runner(b"vetted-step7-guard-no-order")
+            .run(&arb_addr(), |buyer| {
+                let (vm, mut guard) = fresh_guard();
+                vm.set_sender(buyer);
+                let before = vm.snapshot().storage.clone();
+                let res = guard.execute();
+                assert!(matches!(res, Err(GuardError::EscrowNoOrder(_))));
+                assert_eq!(vm.snapshot().storage, before, "revert mutated storage");
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    /// The guard's zero-config constructor rejects arbitrary degenerate
+    /// bindings with nothing written.
+    #[test]
+    fn constructor_zero_config_writes_nothing() {
+        // Which binding is zero: registry / counterparty / both — always at
+        // least one (a valid config is not this property's input).
+        let strat = (0u8..3, any::<bool>());
+        runner(b"vetted-step7-guard-zero-config")
+            .run(&strat, |(which, coin)| {
+                let vm = TestVM::default();
+                vm.set_sender(BUYER);
+                vm.set_contract_address(GUARD_ADDR);
+                let mut guard = Guard::from(&vm);
+                let before = vm.snapshot().storage.clone();
+                let (registry, mm) = match which {
+                    0 => (Address::ZERO, MM),
+                    1 => (REGISTRY, Address::ZERO),
+                    _ => (
+                        Address::ZERO,
+                        if coin { Address::ZERO } else { MM },
+                    ),
+                };
+                let res = guard.constructor(registry, mm);
+                assert!(matches!(res, Err(GuardError::Revert(_))));
+                assert_eq!(vm.snapshot().storage, before, "failed constructor mutated storage");
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    // ---- 4. the ABI encoders (trust boundary: wrong calldata = lost funds) ----
+
+    /// `calldata(sel, args)` = selector ++ args, byte-exact, for arbitrary
+    /// inputs; `enc_word`/`words` round-trip addresses and U256s.
+    #[test]
+    fn calldata_encoders_round_trip_arbitrary_inputs() {
+        let strat = (
+            any::<u32>(),
+            prop::collection::vec(any::<u8>(), 0..97),
+            arb_addr(),
+            any::<u64>(),
+        );
+        runner(b"vetted-step7-guard-encoders")
+            .run(&strat, |(sel, args, addr, amount)| {
+                let data = calldata(sel, &args);
+                assert_eq!(data.len(), 4 + args.len());
+                assert_eq!(&data[0..4], &sel.to_be_bytes());
+                assert_eq!(&data[4..], args.as_slice());
+
+                let word = enc_word(addr);
+                assert!(word[..12].iter().all(|&z| z == 0), "address word left-padded");
+                assert_eq!(&word[12..], addr.as_slice());
+
+                let amount = U256::from(amount);
+                assert_eq!(U256::from_be_bytes(enc_word(amount)), amount);
+
+                let joined = words([addr.into(), amount.into()]);
+                assert_eq!(joined.len(), 64);
+                assert_eq!(&joined[0..32], &enc_word(addr));
+                assert_eq!(&joined[32..], &enc_word(amount));
+                Ok(())
+            })
+            .unwrap();
     }
 }
