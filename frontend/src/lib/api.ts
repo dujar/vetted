@@ -15,18 +15,18 @@ import { mockScanResponse, MOCK_WATCHDOG } from "./mockData";
 export type { ScanResponse } from "vetted-shared";
 
 /**
- * Watchdog response — pinned LOCALLY (verify.md loose end 3): the shared wire
- * has no watchdog type yet (endpoint exists as prose in step-4 task 5 — two
- * numbers, no stored history). Step 8 reconciles this into packages/shared
- * when the endpoint ships; until then this is the only definition.
+ * Watchdog response — re-exported from `vetted-shared` (step-8 reconciliation,
+ * N7 / plan Revised 2026-09-20 note 1): the endpoint shipped in step 4 and the
+ * shared `WatchdogStats` (watchdog.ts) is the canonical wire type, including
+ * `provenanceUrl`. `runs: 0` WITH a `provenanceUrl` is the degrade sentinel —
+ * count unavailable, never a measured zero (wire.md, Watchdog API).
  */
-export interface WatchdogStats {
-  chainId: number;
-  /** Cumulative sequencer-filterer runs — one RPC read upstream. */
-  runs: number;
-  /** Published 6-week baseline, as a daily rate (~150/day, measured 2026-08). */
-  baselinePerDay: number;
-}
+export type { WatchdogStats } from "vetted-shared";
+import type { WatchdogStats } from "vetted-shared";
+
+/** Mock-mode provenance — the published-baseline source behind the inline numbers. */
+export const MOCK_WATCHDOG_PROVENANCE_URL =
+  "https://docs.robinhood.com/chain/differences-from-ethereum";
 
 /** The transport seam step 4's real client satisfies. */
 export interface ScanClient {
@@ -75,11 +75,16 @@ export class FetchWatchdogSource implements WatchdogSource {
   }
 }
 
-/** Inline constants (verify.md loose end 4) until the /watchdog endpoint exists. */
+/** Inline constants (verify.md loose end 4) — the spec's published figures; provenance is that source. */
 export class MockWatchdogSource implements WatchdogSource {
   async stats(chainId: number): Promise<WatchdogStats> {
     await Promise.resolve();
-    return { chainId, runs: MOCK_WATCHDOG.runs, baselinePerDay: MOCK_WATCHDOG.baselinePerDay };
+    return {
+      chainId,
+      runs: MOCK_WATCHDOG.runs,
+      baselinePerDay: MOCK_WATCHDOG.baselinePerDay,
+      provenanceUrl: MOCK_WATCHDOG_PROVENANCE_URL,
+    };
   }
 }
 
