@@ -2,6 +2,7 @@
 
 status:     merged (branch step-7-contract-hardening → main as 93201ab via --no-ff; review round 1 APPROVED 0 blocking; full suite green on merged main: contracts 30+2+14, scan-backend, shared 4+4+21, frontend 84 + build)
 branch:     step-7-contract-hardening
+reconciled: 2026-09-21
 deployed:   not deployed — operator key 0x151e9f57F31310aFeBBB60c222c14badCf938E4C reads 0 balance on 4663/46630/421614 (re-verified by this step 2026-09-21 via eth_getBalance); the 4663 deploy + verify + worker handoff are the named blockers below, with the exact runbook in this file. Everything else (fuzz, docs, gas report, warnings, audit) is done and green.
 
 ## Review round 1 (2026-09-21) — APPROVED, 0 blocking

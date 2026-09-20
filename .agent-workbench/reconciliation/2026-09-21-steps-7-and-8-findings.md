@@ -125,3 +125,28 @@ No spawn tool in this context — plan-judge-agent must be dispatched by the cal
 (round to be logged as `reconcile-2026-09-21`). `reconciled:` stamps on the two
 findings files are WITHHELD until the verdict; this round ends at the plan edits +
 this record.
+
+## Judge round 4 (2026-09-21, plan-judgment.md:110–134) — verdict: 2 gaps; the reconciliation itself ruled faithful; both fixed, round closed
+
+The judge confirmed: every carried item traces to a plan line, dependency order
+coherent (9 needs 7+8, both done; 10 waits on 9), round-3's gaps closed, and the
+two-regime dispatch workable. Two single-clause gaps, both fixed in ddecc37:
+
+1. **[gap, substantive] The erc20() decision existed in no plan — FIXED.** New
+   step-10 Revised note 5 records the coordinator decision (carry to judges' Q&A,
+   NOT a sanctioned contracts change); task 5's submission package now carries the
+   PROMINENT security-note disclosure as a required package item; task 6's Q&A
+   residual-risk list names the item with the worst case (phantom active order for
+   a lying token's buyer → execute reverts whole → funds safe) and the pointer to
+   step-7 findings "Out of scope, left broken".
+2. **[gap, minor] Step-9 note 1's header contradicted the unfunded regime —
+   FIXED.** Reworded to the explicit two-regime dispatch: the funded-run runbook
+   gates TASK 6's dry runs; unfunded, non-chain tasks 1–5 proceed immediately with
+   the runbook staged. This **supersedes this record's escalation 1** wording
+   ("funding ... now gates step 9's start"): funding gates only the dry runs and
+   the on-chain beats, not the step's start — the coordinator may dispatch step 9
+   immediately in whichever regime holds.
+
+**Stamps applied on this verdict:** `reconciled: 2026-09-21` on both findings
+files — step-8's empty line dated; step-7's line ADDED (the file had no
+`reconciled:` line at all, which is why it read as unreconciled this round).

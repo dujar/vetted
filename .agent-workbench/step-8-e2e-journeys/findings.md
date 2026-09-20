@@ -2,7 +2,7 @@
 
 status:     merged
 branch:     step-8-e2e-journeys
-reconciled:
+reconciled: 2026-09-21
 deployed:   pages https://vetted-1un.pages.dev (step-5 bundle redeployed 2026-09-21, preview 91d1d61e.vetted-1un.pages.dev) · live worker https://vetted-scan-backend.dujar-coding.workers.dev (step-4's, unchanged)
 
 ## Review round 1 (2026-09-21) — APPROVED, 0 blocking; dispositions
