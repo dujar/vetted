@@ -27,7 +27,7 @@ import {
   type RegistryRecord,
 } from "vetted-shared";
 
-import { robinhoodChain } from "./chains";
+import { VETTED_CHAIN } from "./chains";
 import { isLiveApi } from "./api";
 import { formatDate, shortAddr } from "./format";
 import { decodeRegistryRecord } from "./registry";
@@ -147,10 +147,11 @@ export async function previewGuard(
 }
 
 // ============================================================================
-// Live source — viem reads against 4663 (registry ABI from vetted-shared,
-// probe selectors from the exported PROBE_SELECTORS constant — the bytes are
-// placeholders until step 2's merge-time calibration replaces them; probe
-// failures degrade to "probe unavailable", never to a guessed pass).
+// Live source — viem reads against the vetted chain (VETTED_CHAIN — 4663 in
+// the product; VITE_CHAIN_ID re-points the bundle at a scratch chain for the
+// e2e live pass). Registry ABI from vetted-shared, probe selectors from the
+// exported PROBE_SELECTORS constant; probe failures degrade to "probe
+// unavailable", never to a guessed pass.
 // ============================================================================
 
 const EIP1967_IMPL_SLOT =
@@ -278,11 +279,11 @@ export function getGuardProbeSource(): GuardProbeSource {
   if (isLiveApi()) {
     const registry = import.meta.env.VITE_REGISTRY_ADDRESS as `0x${string}` | undefined;
     if (!registry) {
-      throw new Error("VITE_API_MODE=live requires VITE_REGISTRY_ADDRESS (deployments/4663.json, step 3/7)");
+      throw new Error("VITE_API_MODE=live requires VITE_REGISTRY_ADDRESS (the deployed registry — deployments/<chain>.json)");
     }
     const client = createPublicClient({
-      chain: robinhoodChain,
-      transport: http(robinhoodChain.rpcUrls.default.http[0]),
+      chain: VETTED_CHAIN,
+      transport: http(VETTED_CHAIN.rpcUrls.default.http[0]),
     });
     return new ViemGuardProbeSource(client, registry);
   }
