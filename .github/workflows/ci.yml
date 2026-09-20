@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: foundry-rs/foundry-action@v1
+      - uses: foundry-rs/foundry-toolchain@v1  # same fix as the replicas job: foundry-action does not exist
         with:
           version: v1.8.1  # match local; foundry releases change tool behavior
       # same pinned-deps discipline as the replicas job — plain clones, never
