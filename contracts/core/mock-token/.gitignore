@@ -1,0 +1,8 @@
+# Foundry deps are restored with the clone commands in README.md (reads
+# foundry.lock). Never commit lib/ — same discipline as contracts/replicas.
+lib/
+# broadcast artifacts are per-run scratch; the tracked receipts of this step
+# land in deployments/<chain>.json (written by scripts/deploy/core/deploy.sh)
+broadcast/
+cache/
+out/

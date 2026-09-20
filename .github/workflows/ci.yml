@@ -41,6 +41,23 @@ jobs:
         run: forge test
         working-directory: contracts/replicas
 
+  mock-token:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-action@v1
+        with:
+          version: v1.8.1  # match local; foundry releases change tool behavior
+      # same pinned-deps discipline as the replicas job — plain clones, never
+      # submodules (foundry.lock names the rev)
+      - name: Restore pinned deps (plain clones at foundry.lock revs)
+        run: |
+          cd contracts/core/mock-token
+          git clone --depth 1 --branch v1.16.2 https://github.com/foundry-rs/forge-std lib/forge-std
+      - name: forge build + pattern tests
+        run: forge test
+        working-directory: contracts/core/mock-token
+
   scan-backend:
     runs-on: ubuntu-latest
     steps:
