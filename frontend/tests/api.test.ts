@@ -4,6 +4,7 @@ import { describe, expect, it, vi, afterEach } from "vitest";
 import {
   FetchScanClient,
   FetchWatchdogSource,
+  MOCK_WATCHDOG_PROVENANCE_URL,
   MockScanClient,
   MockWatchdogSource,
   getScanClient,
@@ -75,11 +76,12 @@ describe("MockScanClient", () => {
 });
 
 describe("MockWatchdogSource", () => {
-  it("serves the spec numbers inline (6,092 runs / ~150 per day)", async () => {
+  it("serves the spec numbers inline (6,092 runs / ~150 per day) with the published-baseline provenance", async () => {
     expect(await new MockWatchdogSource().stats(4663)).toEqual({
       chainId: 4663,
       runs: 6092,
       baselinePerDay: 150,
+      provenanceUrl: MOCK_WATCHDOG_PROVENANCE_URL,
     });
   });
 });
@@ -100,13 +102,14 @@ describe("live clients", () => {
     await expect(new FetchScanClient("https://worker.example").scan(4663, MOCK_VERIFIED_ADDR)).rejects.toThrow("500");
   });
 
-  it("GETs /watchdog with the chainId", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(new Response('{"chainId":4663,"runs":6092,"baselinePerDay":150}', { status: 200 }));
+  it("GETs /watchdog with the chainId and carries provenanceUrl (the shared wire type)", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{"chainId":4663,"runs":6092,"baselinePerDay":150,"provenanceUrl":"https://docs.robinhood.com/chain/contracts"}', { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
     expect(await new FetchWatchdogSource("https://worker.example").stats(4663)).toEqual({
       chainId: 4663,
       runs: 6092,
       baselinePerDay: 150,
+      provenanceUrl: "https://docs.robinhood.com/chain/contracts",
     });
     expect(fetchMock).toHaveBeenCalledWith("https://worker.example/watchdog?chainId=4663");
   });

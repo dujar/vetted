@@ -8,7 +8,7 @@ import { useState } from "react";
 
 import { Chip } from "./components/Chip";
 import { useWalletAdapter } from "./lib/wallet";
-import { ALL_CHAINS, DEFAULT_CHAIN } from "./lib/chains";
+import { ALL_CHAINS, VETTED_CHAIN } from "./lib/chains";
 import { useHashRoute } from "./lib/router";
 import { PRODUCT_WORDMARK } from "./lib/brand";
 import { ScanPage } from "./pages/ScanPage";
@@ -18,7 +18,7 @@ import { RegistryPage } from "./pages/RegistryPage";
 export default function App() {
   const route = useHashRoute();
   const wallet = useWalletAdapter();
-  const [chainId, setChainId] = useState<number>(DEFAULT_CHAIN.id);
+  const [chainId, setChainId] = useState<number>(VETTED_CHAIN.id);
 
   const nav = (
     <nav style={{ display: "flex", gap: "var(--s4)", fontSize: "var(--fs-1)" }}>

@@ -6,7 +6,7 @@
  * wording is load-bearing (journeys.md:34).
  */
 import { useEffect, useState } from "react";
-import { ALL_CHAINS, robinhoodChain } from "../lib/chains";
+import { ALL_CHAINS, VETTED_CHAIN } from "../lib/chains";
 import {
   classifyExecuteError,
   getGuardProbeSource,
@@ -30,9 +30,14 @@ type Phase =
   | { s: "refused"; reason: GuardRevertReason | null; txHash?: string }
   | { s: "nothing-sent"; kind: "rejected" | "gas" };
 
+// Lazy module singleton — a per-render default would re-fire the preview
+// effect every cycle (infinite loop in the browser; found by e2e).
+let defaultProbeSource: GuardProbeSource | null = null;
+const probeSourceDefault = (): GuardProbeSource => (defaultProbeSource ??= getGuardProbeSource());
+
 export function SwapPage({
   wallet,
-  probeSource = getGuardProbeSource(),
+  probeSource = probeSourceDefault(),
 }: {
   wallet: WalletAdapter;
   probeSource?: GuardProbeSource;
@@ -110,17 +115,20 @@ export function SwapPage({
   }
 
   // --- wrong network: before any quoting (journeys.md:34) -------------------
-  if (wallet.chainId !== robinhoodChain.id) {
+  // VETTED_CHAIN is 4663 in the product; VITE_CHAIN_ID re-points the bundle at
+  // a scratch chain for the e2e live pass (step 8) — default copy unchanged.
+  if (wallet.chainId !== VETTED_CHAIN.id) {
     const name = ALL_CHAINS.find((c) => c.id === wallet.chainId)?.name ?? `chain ${wallet.chainId ?? "?"}`;
+    const vettedLabel = `${VETTED_CHAIN.name} · ${VETTED_CHAIN.id}`;
     return (
       <div className="panel">
         <h1 style={{ fontSize: "var(--fs-4)", margin: "0 0 var(--s3)" }}>Guarded swap</h1>
         <p className="muted" style={{ fontSize: "var(--fs-1)", margin: "0 0 var(--s2)" }}>
-          Wallet is connected to <strong>{name}</strong> — switch to Robinhood Chain · 4663 to quote.
-          Stock-token verdicts and the Canonical Registry live on 4663; funds never move on a revert.
+          Wallet is connected to <strong>{name}</strong> — switch to {vettedLabel} to quote.
+          Stock-token verdicts and the Canonical Registry live on {VETTED_CHAIN.id}; funds never move on a revert.
         </p>
         <button className="btn ghost" onClick={() => void wallet.switchToVetted()}>
-          Switch to Robinhood Chain · 4663
+          {`Switch to ${vettedLabel}`}
         </button>
       </div>
     );
@@ -156,7 +164,7 @@ export function SwapPage({
           <div className="faint">outcome lands here the moment the receipt does</div>
         </div>
         <p className="faint mono" style={{ fontSize: "var(--fs-0)", margin: 0 }}>
-          Robinhood Chain · 4663
+          {`${VETTED_CHAIN.name} · ${VETTED_CHAIN.id}`}
         </p>
       </div>
     );

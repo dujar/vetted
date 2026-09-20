@@ -1,18 +1,23 @@
 /**
  * Canonical Registry reads (plan task 4 / J3). The on-chain ABI is
  * point-lookup only (`getRecord`, no enumerate — abi.ts), so the table is
- * driven by the known-token list (verify.md loose end 5: mock + live
- * identical); live mode runs one getRecord per token plus an erc20 symbol
- * read through viem. Registry address comes from VITE_REGISTRY_ADDRESS —
- * deployments/*.json only exists after steps 3/7, and importing a
- * not-yet-created file would break the build (documented in findings).
+ * driven by the known-token list; live mode runs one getRecord per token plus
+ * an erc20 symbol read through viem. Registry address comes from
+ * VITE_REGISTRY_ADDRESS — deployments/*.json only exists after steps 3/7, and
+ * importing a not-yet-created file would break the build (documented in
+ * findings).
+ *
+ * Step 8: live reads target VETTED_CHAIN (4663 in the product; VITE_CHAIN_ID
+ * re-points the bundle at a scratch chain), and VITE_REGISTRY_TOKENS overrides
+ * the token list for chains whose known tokens are not the product table —
+ * that is the live J3 UI path for the step-3/6 scratch deployments.
  */
 import { createPublicClient, http, zeroAddress, type PublicClient } from "viem";
 import { erc20Abi } from "viem";
 import { REGISTRY_ABI } from "vetted-shared";
 import type { RegistryRecord } from "vetted-shared";
 
-import { robinhoodChain } from "./chains";
+import { VETTED_CHAIN } from "./chains";
 import { isLiveApi } from "./api";
 import { KNOWN_TOKENS, type KnownToken } from "./mockData";
 
@@ -72,6 +77,22 @@ export class MockRegistrySource implements RegistrySource {
   }
 }
 
+/**
+ * Live-mode known-token list. Product default: the fixture-derived
+ * KNOWN_TOKENS table. VITE_REGISTRY_TOKENS (comma-separated 0x… addresses)
+ * re-points the table at another chain's tokens — the e2e live pass feeds the
+ * scratch deployments this way; names fall back to the live symbol reads.
+ */
+function knownTokens(): KnownToken[] {
+  const raw = import.meta.env.VITE_REGISTRY_TOKENS ?? "";
+  const addresses = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((a) => /^0x[0-9a-fA-F]{40}$/.test(a));
+  if (addresses.length === 0) return KNOWN_TOKENS;
+  return addresses.map((address) => ({ address, name: "", symbol: "", record: null, revocationTx: null }));
+}
+
 export class ViemRegistrySource implements RegistrySource {
   constructor(
     private readonly client: PublicClient,
@@ -79,9 +100,9 @@ export class ViemRegistrySource implements RegistrySource {
   ) {}
 
   async rows(chainId: number): Promise<RegistryRow[]> {
-    void chainId; // reads always target 4663 — the registry lives there (journeys.md:42)
+    void chainId; // reads target VETTED_CHAIN — the client is built on it (journeys.md:42)
     return Promise.all(
-      KNOWN_TOKENS.map(async ({ address, name, symbol }: KnownToken): Promise<RegistryRow> => {
+      knownTokens().map(async ({ address, name, symbol }: KnownToken): Promise<RegistryRow> => {
         const raw = await this.client.readContract({
           address: this.registryAddress,
           abi: REGISTRY_ABI,
@@ -99,7 +120,7 @@ export class ViemRegistrySource implements RegistrySource {
         } catch {
           // constant symbol is the fallback — never blocks the table
         }
-        return { token: address, name, symbol: symbolLive, record, revocationTx: null };
+        return { token: address, name: name || symbolLive, symbol: symbolLive, record, revocationTx: null };
       }),
     );
   }
@@ -109,11 +130,11 @@ export function getRegistrySource(): RegistrySource {
   if (isLiveApi()) {
     const address = import.meta.env.VITE_REGISTRY_ADDRESS as `0x${string}` | undefined;
     if (!address) {
-      throw new Error("VITE_API_MODE=live requires VITE_REGISTRY_ADDRESS (deployments/4663.json, step 3/7)");
+      throw new Error("VITE_API_MODE=live requires VITE_REGISTRY_ADDRESS (the deployed registry — deployments/<chain>.json)");
     }
     const client = createPublicClient({
-      chain: robinhoodChain,
-      transport: http(robinhoodChain.rpcUrls.default.http[0]),
+      chain: VETTED_CHAIN,
+      transport: http(VETTED_CHAIN.rpcUrls.default.http[0]),
     });
     return new ViemRegistrySource(client, address);
   }

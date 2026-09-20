@@ -11,4 +11,10 @@ interface ImportMetaEnv {
   readonly VITE_REGISTRY_ADDRESS?: string;
   /** Deployed guarded-swap guard address. Empty = live execution unavailable. */
   readonly VITE_GUARD_ADDRESS?: string;
+  /** Chain id the bundle targets for verdicts/swaps/registry (e2e scratch passes). Unset = 4663 product default. */
+  readonly VITE_CHAIN_ID?: string;
+  /** e2e-only: adds wagmi's injected() connector so the Playwright stub wallet can connect (lib/wagmi.ts). */
+  readonly VITE_E2E_STUB_WALLET?: string;
+  /** Live-mode known-token list override, comma-separated 0x… addresses (lib/registry.ts) — non-4663 registry reads. */
+  readonly VITE_REGISTRY_TOKENS?: string;
 }

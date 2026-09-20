@@ -45,3 +45,13 @@ export const VETTED_CHAINS = [
 export const ALL_CHAINS = [robinhoodChain, robinhoodTestnet, arbitrumSepolia] as const;
 
 export const DEFAULT_CHAIN = robinhoodChain;
+
+/**
+ * The chain verdicts, swaps and the Canonical Registry target — 4663 in the
+ * product. VITE_CHAIN_ID re-points a bundle at another configured chain (the
+ * e2e live pass against the step-3/6 scratch deployments, 46630/421614); with
+ * the env unset this is robinhoodChain, so the product build is unchanged.
+ */
+const requestedChainId = Number(import.meta.env.VITE_CHAIN_ID ?? NaN);
+export const VETTED_CHAIN: Chain =
+  ALL_CHAINS.find((c) => c.id === requestedChainId) ?? robinhoodChain;

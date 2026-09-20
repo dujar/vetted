@@ -9,7 +9,7 @@
 import { useAccount, useConnect, usePublicClient, useSwitchChain, useWriteContract } from "wagmi";
 import { GUARD_ABI } from "vetted-shared";
 
-import { robinhoodChain } from "./chains";
+import { VETTED_CHAIN } from "./chains";
 import {
   getGuardProbeSource,
   GuardExecutionRequest,
@@ -82,7 +82,7 @@ export function useWalletAdapter(): WalletAdapter {
     if (!isLiveApi()) return createMockGuardExecutor(getGuardProbeSource())(req);
     const guard = import.meta.env.VITE_GUARD_ADDRESS as `0x${string}` | undefined;
     if (!guard || !publicClient) {
-      throw new Error("VITE_API_MODE=live requires VITE_GUARD_ADDRESS (deployments/4663.json, step 3/7)");
+      throw new Error("VITE_API_MODE=live requires VITE_GUARD_ADDRESS (the deployed guard — deployments/<chain>.json)");
     }
     return liveExecute(writeContractAsync, publicClient, guard, req);
   };
@@ -102,7 +102,7 @@ export function useWalletAdapter(): WalletAdapter {
       await connectAsync({ connector: first });
     },
     switchToVetted: async () => {
-      await switchChainAsync({ chainId: robinhoodChain.id });
+      await switchChainAsync({ chainId: VETTED_CHAIN.id });
     },
     execute,
   };

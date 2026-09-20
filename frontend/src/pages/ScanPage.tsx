@@ -32,11 +32,20 @@ export interface ScanPageProps {
   watchdog?: WatchdogSource;
 }
 
+// Default sources are lazy module singletons: a fresh instance per render
+// (what a default parameter evaluates to) would re-fire the watchdog effect
+// every cycle — an infinite fetch→set→render loop in the browser (found by
+// the e2e journeys; unit tests inject stable props so they never saw it).
+let defaultScanClient: ScanClient | null = null;
+let defaultWatchdog: WatchdogSource | null = null;
+const scanClient = (): ScanClient => (defaultScanClient ??= getScanClient());
+const watchdogSource = (): WatchdogSource => (defaultWatchdog ??= getWatchdogSource());
+
 export function ScanPage({
   chainId,
   onChainChange,
-  client = getScanClient(),
-  watchdog = getWatchdogSource(),
+  client = scanClient(),
+  watchdog = watchdogSource(),
 }: ScanPageProps) {
   const route = useHashRoute();
   const addrs = route.path === "/" ? route.query.getAll("addr") : [];
