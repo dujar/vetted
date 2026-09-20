@@ -132,3 +132,32 @@ With this ruling the withheld `reconciled:` stamps may be dated: step-8 findings
 ## Verdict
 
 2 gaps (1 substantive, 1 minor). The reconciliation is faithful — all carried items trace to plan lines, the dependency graph is true, round-3's gaps are closed, and the two-regime dispatch works. Both fixes are single-clause plan edits; once applied, the set ships: steps 9 then 10 reach the spec's success line with the submission package, freeze, and disclosures complete.
+
+---
+
+# Round 5 (2026-09-21) — reconciliation of step-9 findings into step 10 (commit aecd05a)
+
+Set judged: step-10 plan.md as amended by aecd05a (Revised note 6, items 1–4) against `reconciliation/2026-09-21-step-9-findings.md`, step-9 findings (merged 7841eaf, `reconciled:` still empty by design), the step-10 verify pass (untracked verify.md, produced against the PRE-aecd05a plan — its plan.md:44–47 line refs predate note 6), the tracker (steps 1–9 done, 10 planned), and spec.md. Ground truth re-verified live on main aecd05a: `deployments/` holds only pages.json/worker.json/README.md (note 6.1's trigger condition is real at step-10 start); step-9 findings carries the "Task-6 go-list" as numbered items 1–8; `demo/runbook.md` §6 "Failure appendix" exists; README.md:1 and `frontend/src/lib/brand.ts:2` still carry the placeholder framing verify LE 3 cites. Steps 1–9 done-state untouched: the diff is the new record file + 6 plan lines, nothing else.
+
+## The four items trace
+
+1. **Go-list as production deploy path → note 6.1 (plan.md:28).** Condition-based on `4663.json` absence at step-10 start (verified absent), cites go-list items 1–8 which exist verbatim in step-9 findings:46–54 in the same order (runbook → replicas before stage F → one worker reconfig → seed-demo → live playwright → serve → dry runs). Task 2 becomes verify-mode, task 3 runs on its output — both bindings named inside the note.
+2. **Name-lock resolution + demo.gif → note 6.2 (plan.md:29).** fc8b004 on main is the lock commit (message confirms "PRODUCT NAME LOCKED: Vetted"; tracker row 9 set done). The demo.gif uncomment is bound to task 5 inside the note; verify LE 3 will append it to the task line proper — refinement, not conflict.
+3. **P-receipt routing → note 6.3 (plan.md:30).** Matches step-9 findings go-list step 7 ("between takes ... record it here when one lands") and its out-of-scope line; smoke chases only as fallback ("only if step-9's findings still show it pending at step-10 start"). The literal reading does make task 3 chase when the go-list ran at step-10 start after findings showed pending at start — chasing via `live-check.sh` is idempotent, and by then the receipt is either landed (nothing to chase) or captured on the spot. No contradiction.
+4. **Smoke re-runs via runbook §6 → note 6.4 (plan.md:31).** Matches step-9 findings "What the plan was wrong" (monotone registry transitions, seed-demo exits with the recovery path) and runbook §6 exists.
+
+## Both funding regimes executable
+
+Note 6.1's dispatch is condition-based (file absent or not), not timing-based, so it is deterministic however funding lands: absent-at-start + funded → go-list first, tasks 2/3 verify/smoke its output; funded + already ran → explicit no-op ("audit, don't redo"). The never-funded arm is exactly verify LE 1's prescribed fix (go/no-go date + declared unfunded variant or escalation), to be applied by the builder right after this round — the two compose: 6.1 is the funded-but-unexecuted arm, LE 1 is the funding-never-lands arm. A builder applying LE 1 should word it as the funding-absent branch of note 6.1 so "execute the go-list FIRST" is not read as unconditional.
+
+## Verify loose ends vs note 6 — compatible
+
+- **LE 1 ↔ 6.1:** complementary arms, no overlap in trigger (see above).
+- **LE 2 ↔ 6.2/6.3:** disclosure-only (known-limits list mirrors what the live URLs show, incl. P-receipt status at freeze); no routing conflict with 6.3's chase rules; regime-aware wording matches 6.1's branches.
+- **LE 3 ↔ 6.2:** 6.2's "brand.ts is final as-is" fixes the name VALUE ("Vetted" already in the constant); LE 3 strips the stale placeholder LABEL at brand.ts:2 and README.md:1 (anchors verified present). Value-final and label-cleanup do not conflict; the builder edits the comment, not the constant.
+- **LE 4 ↔ 6:** tag-at-end-of-task-5 (or tag=freeze + re-cut rule) is consistent with 6.2's gif-uncomment landing in task 5 before the tag — tagged tree = submitted tree. No interaction otherwise.
+- **LE 5 ↔ 6.3 (caveat, not a gap):** today the repo is public and 6.3's "step 10 links it from there" (the step-9 findings path) resolves. Only if the coordinator's LE-5 decision lands on the SCRUB branch would that package link die with `.agent-workbench/**`. The LE-5 fix already forces the decision before freeze; under the scrub branch the same pass should copy the receipt (or its live-check evidence) into `submission/**` rather than link the workbench path. One clause, decided at the same moment — no plan line is wrong today.
+
+## Verdict
+
+SHIPPABLE, 0 gaps. All four reconciled items trace to concrete note-6 lines with live triggers and resolvable targets; step 10 executes in both regimes; the five verify prescriptions compose with note 6 without contradiction (LE 1 = the unfunded arm of 6.1; LE 3 = the label cleanup 6.2 deliberately doesn't cover); nothing in steps 1–9's done-state is disturbed. With this ruling the withheld `reconciled:` stamp on step-9 findings.md may be dated (standing pattern), and the builder applying verify LE 1–5 may dispatch.
