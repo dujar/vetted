@@ -5,6 +5,17 @@ branch:     step-8-e2e-journeys
 reconciled:
 deployed:   pages https://vetted-1un.pages.dev (step-5 bundle redeployed 2026-09-21, preview 91d1d61e.vetted-1un.pages.dev) · live worker https://vetted-scan-backend.dujar-coding.workers.dev (step-4's, unchanged)
 
+## Review round 1 (2026-09-21) — APPROVED, 0 blocking; dispositions
+
+Verified by the reviewer re-running everything: frontend 84/84, shared 21/21, build exit 0, e2e 28 passed + 3 honest skips, e2e tsc clean.
+
+1. Fifth frontend change (default-param sources → lazy singletons) — **RATIFIED by the coordinator** as a sanctioned scope extension (journey-blocking class, disclosed, minimal). No action.
+2. `RETRY_MAX_ATTEMPTS` exported but unused; README overstated the policy — **FIXED**: the live retry spec now loops the policy via `retryScanUntilSettled` (deterministic route still recovers on retry 1, request count still pinned).
+3. J3 empty-registry state not exercised e2e (unit-pinned at `frontend/tests/registry.test.tsx:76`) — **recorded for reconcile**: forcing an e2e empty state would need an out-of-scope frontend hook (mock source has no empty sentinel). Journeys-contract residue, coordinator-carried.
+4. Stale port numbers (:4173/:4174) in README + config header — **FIXED** (:4883/:4884, env-overridable noted).
+5. Seed-script header listed PAUSED before IMPL_MISMATCH, contradicting the correct body — **FIXED** (header now states guard order).
+6. Unscoped `getByText("0")` degrade-sentinel assertion — **FIXED** (scoped to the watchdog panel).
+
 ## What was built
 
 The journey suite in `e2e/` — Playwright, two servers over the real bundle: **mock** (fixture-backed, offline-capable, 21 specs green) and **live** (VITE_API_MODE=live + step-4 worker; 7 specs green, 3 activation-gated skips). J1 full matrix (typed + deep link, both entry formats; VERIFIED/IMPOSTOR/REVOKED/UNVERIFIED; not-a-contract; wrong-network read-only notice + switch-back; degraded banner; RPC_RETRYABLE retry; depth-boundary copy; wallet-free pinned via `window.ethereum === undefined`), J2 (stub EIP-1193 wallet through wagmi's `injected()` seam; wrong-network switch BEFORE quoting; settle + all five `GUARD_*` reasons byte-exact from `vetted-shared`'s `GUARD_REVERT_REASONS`; route-forced wallet-rejection + gas-failure), J3 (table + REVOKED drill-in, criteria panel with `SELECTORS.getRecord`, degraded forced via RPC-failure interception; empty state covered by unit tests). Live-worker payload honesty asserted (watchdog degrade sentinel `runs:0 + provenanceUrl`, never a fabricated VERIFIED without rows). Files: `e2e/{playwright.config.ts,package.json,tsconfig.json,README.md,.gitignore}`, `e2e/fixtures/{constants,deployments,scratch,rpc,stubWallet}.ts`, `e2e/specs/{scan,swap,registry}.spec.ts + {scan,swap,registry}.live.spec.ts`, `e2e/scripts/seed-scratch.sh`. Frontend deltas (sanctioned, below) + the N7 fold-in.
