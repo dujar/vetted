@@ -82,8 +82,10 @@ the final take; uncomment then — links must resolve at submission):
 **Demo-cast labeling:** the replica tokens in `contracts/replicas/` (the
 "Aurelia Industries" cast, manifest in [`demo/assets.md`](demo/assets.md))
 are demo artifacts — self-deployed on the public chain for the live beats,
-carrying no liquidity and no holder base; the tool's own rules flag the
-impostor twins, and the decoys double as live evidence.
+carrying no liquidity and no holder base. The tool's depth boundary marks
+the impostor twins UNVERIFIED (never a guessed IMPOSTOR), and the guard
+refuses them on-chain at execution — no verification record, no settlement.
+The decoys double as live evidence.
 
 ## Layout
 

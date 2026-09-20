@@ -5,6 +5,23 @@ branch:     step-9-demo-harness (off main 8648efc; 5 commits, latest 0404441)
 reconciled:
 deployed:   not deployed — unfunded regime (operator key 0 wei on 4663/421614, re-checked 2026-09-21); tasks 1–5 built + rehearsed, task 6 staged (go-list below)
 
+## Review round 1 (2026-09-21) — 2 blocking, both fixed; dispositions
+
+1. arc.sh beat 6 printed the post-revocation scan but never asserted it (a
+   stale VERIFIED/UNVERIFIED read would exit 0 with §5 wall-clocks pasted) —
+   **FIXED**: the REVOKED assertion now gates the beat (same shape as beat
+   2's honesty gates); a stale read fails the run with the re-take message.
+2. README demo-cast paragraph copied step-6's stale "the tool's own rules
+   flag the impostor twins" — contradicting the honest twin beat (LE 2) —
+   **FIXED**: "The tool's depth boundary marks the impostor twins UNVERIFIED
+   (never a guessed IMPOSTOR), and the guard refuses them on-chain at
+   execution."
+3. Non-blocking notes: `6,092` appears only inside the runbook's prohibition
+   (compliant, kept); friendly worker-unreachable message added to arc.sh
+   preflight (was a raw curl error); `.replicas` JSON shape example with the
+   forge-log-key mapping added to runbook go-list step 2.
+   `--anvil-rehearsal` re-run green post-fix (0.3s upgrade leg, 2026-09-21).
+
 ## What was built
 
 The demo harness, funding-free per the two-regime dispatch (Revised 2026-09-21 note 1):

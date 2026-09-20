@@ -129,7 +129,8 @@ IMPL_V2=$(jq -r '.replicas.implV2 // empty' "$DEP"); TWIN1=$(jq -r '.replicas.tw
 TOKEN_A=$(jq -r '.mockTokens.tokenA // empty' "$DEP")
 [ -n "$REGISTRY" ] && [ -n "$GUARD" ] && [ -n "$REPLICA" ] && [ -n "$BEACON" ] && [ -n "$IMPL_V2" ] \
   || { echo "$DEP lacks core+replicas fields — runbook go-list steps 2-4 first" >&2; exit 1; }
-HEALTH=$(curl -fsS "$BASE_URL/health" | jq -r '.ok')
+HEALTH=$(curl -fsS "$BASE_URL/health" 2>/dev/null | jq -r '.ok') \
+  || { echo "worker unreachable at $BASE_URL — runbook §6 fallbacks apply" >&2; exit 1; }
 [ "$HEALTH" = "true" ] || { echo "worker /health not ok — beat fallbacks apply (runbook §6)" >&2; exit 1; }
 : "${OPERATOR_KEY:?set OPERATOR_KEY (funded demo operator)}"
 BUYER_KEY="${BUYER_KEY:-$OPERATOR_KEY}"
@@ -212,6 +213,8 @@ else
 
   scan_retry "$REPLICA"
   printf '%s\n' "$SCAN_JSON" | jq -r '"  replica verdict now: \(.verdict)  revocationTx: \(.revocationTx // "not indexed")"'
+  printf '%s\n' "$SCAN_JSON" | jq -e '.verdict == "REVOKED"' >/dev/null \
+    || { echo "HONESTY: replica does not read REVOKED after the confirmed revocation — stale/rate-limited read; blocking, re-take, never narrate over it" >&2; exit 1; }
 
   # the refusal, on-chain: commit then execute → expect GUARD_RECORD_REVOKED
   T_RF0=$(now)

@@ -32,7 +32,18 @@ missing):
 2. `DEPLOY_KEY=$SPIKE_DEPLOY_KEY RPC_URL=https://rpc.mainnet.chain.robinhood.com ./scripts/deploy/replicas/deploy.sh`
    → append the logged addresses to `deployments/4663.json` under `replicas`
    (create the file; writer: step 6/9 per `deployments/README.md`) AND to
-   `demo/assets.md`.
+   `demo/assets.md`. Forge log key → JSON key mapping (the shape every
+   step-9 consumer reads — seed-scratch.sh:52-54, seed.sh, serve.sh):
+   ```json
+   "replicas": {
+     "implV1": "0x…",   // REPLICA_IMPL_V1
+     "implV2": "0x…",   // REPLICA_IMPL_V2_UPGRADE_TARGET (the beat-6 target)
+     "beacon": "0x…",   // REPLICA_BEACON (setBlocked/pause/upgradeTo live here)
+     "proxy":  "0x…",   // REPLICA_PROXY (canonical demo token)
+     "twin1":  "0x…",   // TWIN1_IMPOSTOR_PLAIN
+     "twin2":  "0x…"    // TWIN2_IMPOSTOR_SELFPROXY_PROXY
+   }
+   ```
 3. `DEPLOY_KEY=$SPIKE_DEPLOY_KEY ./scripts/deploy/core/deploy.sh --chain 4663`
    → registry + guard + mock tokens + the 11 receipts; stage F shallow-merges
    `deployments/4663.json` append-only over the `replicas` field.
