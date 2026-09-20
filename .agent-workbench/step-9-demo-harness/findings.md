@@ -1,7 +1,7 @@
 # Step 9 — demo harness (the scripted 5-minute arc + submission master assets)
 
-status:     blocked (review round 1 pending — builder context has no spawn tool; dispatch review-agent on branch step-9-demo-harness, worktree /home/bitslicer/projects/vetted-step9-wt, then re-invoke; nothing else blocks tasks 1–5)
-branch:     step-9-demo-harness (off main 8648efc; 5 commits, latest 0404441)
+status:     merged (main 25a1bf3 via --no-ff; review round 2 APPROVED — both round-1 blockers fixed as prescribed, non-blocking notes taken; full suite green on merged main: contracts 30+2+14, scan-backend 40+5, shared 21+4+4, frontend 84 + build, e2e 28 passed + 3 activation-gated skips)
+branch:     step-9-demo-harness (off main 8648efc; merged, pushed)
 reconciled:
 deployed:   not deployed — unfunded regime (operator key 0 wei on 4663/421614, re-checked 2026-09-21); tasks 1–5 built + rehearsed, task 6 staged (go-list below)
 
