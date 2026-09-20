@@ -16,7 +16,7 @@ No epics ledger — v1 planned directly from the approved spec.md.
 | 5    | 2     | frontend-screens   | step-5-frontend-screens/      | done    | 1          | Sep 13–24 (starts parallel with step 2) | frontend/src/pages, frontend/src/lib, frontend tests |
 | 6    | 2     | replica-assets     | step-6-replica-assets/        | done    | 1, 2       | Sep 19–26           | contracts/replicas/** (own foundry project), scripts/deploy/replicas/, demo/assets.md |
 | 7    | 3     | contract-hardening | step-7-contract-hardening/    | done    | 3          | Sep 27–29           | contracts/core tests+docs only, docs/, gas report, 4663 core deploy |
-| 8    | 3     | e2e-journeys       | step-8-e2e-journeys/          | planned | 3, 4, 5, 6 | Sep 27–30           | e2e/** (+ one-file exception: frontend/src/lib/api.ts WatchdogStats.provenanceUrl fold-in — judge round-4 gap 2) |
+| 8    | 3     | e2e-journeys       | step-8-e2e-journeys/          | done    | 3, 4, 5, 6 | Sep 27–30           | e2e/** (+ one-file exception: frontend/src/lib/api.ts WatchdogStats.provenanceUrl fold-in — judge round-4 gap 2) |
 | 9    | 3     | demo-harness       | step-9-demo-harness/          | planned | 7, 8       | Oct 1–2             | demo/**, scripts/seed-demo/ |
 | 10   | 3     | deploy-submission  | step-10-deploy-submission/    | planned | 7, 9       | Oct 3 (submit; close 10-04 23:59 SGT) | deploy orchestration, submission/**, release tag |
 
