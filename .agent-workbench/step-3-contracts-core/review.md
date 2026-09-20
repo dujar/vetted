@@ -105,3 +105,82 @@ The step is not complete: task 4 and task 5's code half are missing with no
 owner under the current plans (finding 1). Fix = land the mock-token foundry
 project + `scripts/deploy/core/` script + deployments writers on this branch,
 or get an explicit re-scope recorded before merge.
+
+---
+
+# Review round 2 (2026-09-20)
+
+Scope: branch rebased onto main 559344c; round-2 commits 7eaa13f (mock-token
+foundry project + scripts/deploy/core/deploy.sh + CI job), 3d5a261 (rebase
+reconciliation), c6fee15/9ba3b11 (docs). The 25e1c3f..7eaa13f diffstat also
+sweeps in main's step-4 merge (scan-backend, watchdog) — not reviewed here.
+
+## Round-1 finding 1 — CLOSED
+
+- **Mocks genuinely mirror the guard.** `ForwarderPatch.locateShape` is the
+  guard's `extract_beacon_from_code` opcode-for-opcode (loop bound
+  `i+33 <= len`, zero-prefix `code[i+1..i+13]`, window `[i+33, min(i+49,len))`,
+  4-byte `0x5c60da1b` scan, address at `[i+13,i+33)`) — verified line-by-line
+  against guard/src/lib.rs:590–608. The genuine runtime is tripwired at TEST
+  RUNTIME against the committed `spike/evidence/p_proxy.hex`
+  (test_genuine_runtime_matches_spike_evidence reads the file via the scoped
+  fs permission; 283-byte asserts), not just a copied constant.
+  `patchBeacon` overwrites only the 20-byte span and re-extracts before
+  returning (PatchFailed otherwise); the byte-diff test proves nothing outside
+  the span moves. Pattern semantics match calibration_4663.json: blocklist ON
+  the beacon with the selector asserted REVERTING via proxy AND impl AND plain
+  token (MockPattern.t.sol:123–138); pause per-proxy (test asserts tokenB
+  unaffected); shared beacon + shared impl v1; upgrade moves resolution and
+  preserves proxy storage; plain token extracts to address(0) (degrade path).
+  13/13 forge tests pass this session; the mock side of the receipts is real.
+- **deploy.sh writer discipline matches deployments/README.md.** Shallow-merge
+  `jq -s '.[0] * .[1]'` appends step-3 fields over existing content without
+  clobbering other writers' blocks (421614/46630 writers "3, 6"); writes only
+  `deployments/<chain>.json`; fail-loud at every parse (mock addresses, the
+  exactly-11 guard execute() receipts joined by hash, per-row status vs
+  expected, ≤200k gate) BEFORE any deployments write. Chain→RPC map = the
+  wire.md pins; receipts composition = Revised note 7 (settle + 5 reverts +
+  cleanup settles all gated); --verify per Revised note 6 (Etherscan v2
+  chainid=421614 / Blockscout 46630). Registry/guard deploys validated by
+  cast-call getters, not output parsing alone.
+- **Rebase reconciliations verified in the working tree:** the mock-token CI
+  job uses `foundry-toolchain@v1` (3d5a261 — 7eaa13f's intermediate state had
+  the dead `foundry-action`; fixed before I flagged it), and the stale
+  dangling-events comment is gone from packages/shared/index.ts with exports
+  intact.
+- **Suites this session:** cargo 35/35 (guard 21 + registry 12 + hello 2),
+  mock-token forge 13/13, shared vitest 21/21.
+
+## Residual (disclosed) — RULED: not blocking
+
+RunReceipts has never run end-to-end (no usable stylus devnode locally;
+operator key unfunded — the standing authorization). The untested surface is
+the JOIN only: forge script driving the real Stylus guard/registry over RPC,
+plus the broadcast-receipt jq join and gas gate. The two halves are each
+tested (forge 13 on the mock side, native 33 on the guard side, and the probe
+sequence is mirrored + asserted in both), deploy.sh fails loudly rather than
+writing a wrong deployments entry, and `--skip-receipts` marks the gate
+"pending" instead of faking it. **Routing requirement:** the first funded run
+must go through `deploy.sh` end-to-end so stage D/E executes and any foundry
+broadcast-JSON shape drift surfaces BEFORE step 7/8 consume `deployments/`;
+record the receipts there as step 3's committed gas actuals (step-7 task 2
+diffs against them).
+
+## Non-blocking notes (round 2)
+
+1. RunReceipts/deploy.sh stage D–E are inspection-validated only (the
+   residual above) — first funded run owns any fix.
+2. Stage G source-verifies MockBeacon + MockTokenImpl only; the hull
+   forwarders (raw-runtime deploys) are unverifiable by construction — a
+   one-line README statement would pre-empt the question.
+3. `deployments/README.md` lists writers of `4663.json` as 6/7 while
+   deploy.sh accepts `--chain 4663`; per plan step 3 never runs there (task 5
+   targets 421614+46630; 4663 is step 7's, via "the same script") and the
+   merge writer cannot clobber — no action needed now.
+
+## Verdict
+
+Round-1 blocking finding closed with real, tested artifacts. All pinned
+decisions hold; tests are non-vacuous on every layer. Nothing blocks the
+merge. The on-chain receipts remain deferred under the standing funding
+authorization, with the routing requirement above.
