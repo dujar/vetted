@@ -77,4 +77,8 @@ stylus devnode (or funded testnet; `spike/DEPLOY.md` runbook).
 `forge verify-contract` per contract: `--chain-id 421614` (Etherscan API v2 +
 ETHERSCAN_API_KEY) on Arbitrum Sepolia; `--verifier blockscout --verifier-url
 https://explorer.testnet.chain.robinhood.com/api` on 46630
-(`.agent-workbench/knowledge/contract-verification.md`).
+(`.agent-workbench/knowledge/contract-verification.md`). Note: only MockBeacon
+and MockTokenImpl are source-verifiable — the pattern forwarders are raw
+283-byte runtime deploys (no Solidity source of their own), so they are
+unverifiable by construction; their provenance is the ForwarderPatch tripwire
+test against `spike/evidence/p_proxy.hex`.

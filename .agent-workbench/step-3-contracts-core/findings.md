@@ -1,6 +1,6 @@
 # Step 3 — contracts-core (Canonical Registry + Guarded Swap, Rust/Stylus)
 
-status:     blocked
+status:     ready-to-merge
 branch:     step-3-contracts-core
 deployed:   not deployed — operator key 0x151e9f57F31310aFeBBB60c222c14badCf938E4C has balance 0 on 421614, 46630 and 4663 (cast balance, 2026-09-20); the task 5/6 on-chain RUN and its receipts stay deferred per the standing dispatch (code + script are landed and validated as far as funds allow)
 
@@ -21,6 +21,7 @@ Nothing new this session; round 1's dispositions stand. Two scope/reality notes 
 ## What the next step needs to know
 - **Funding is the only remaining manual step** (`spike/DEPLOY.md` — faucet links; headless 46630 funding documented impossible, `spike/evidence/funding_blockers_20260919.txt`). When funded: `DEPLOY_KEY=0x… ./scripts/deploy/core/deploy.sh --chain 421614` produces the five revert receipts + degraded + settle, the ≤200k assertions, `deployments/421614.json`, and (with `--verify`) the verified pages. `--receipts-only` re-runs receipts against a prior deploy. `MM_KEY` distinct from `DEPLOY_KEY` gives the two-party settle accounting (one-key fallback = self-fill, logged).
 - **Residual risk, honestly:** RunReceipts has NOT run end-to-end (no usable stylus devnode image locally — `offchainlabs/stylus-devnode` not pullable, local nitro-node-dev build rejects `--dev`/exits). Deploy-side is validated read-only (see above); the forge expectRevert-under-broadcast pattern is standard foundry. If the funded run hits script friction, it is re-runnable without redeploying.
+- **Review round 2 (APPROVED) routing requirement + dispositions:** the FIRST funded run must go through `deploy.sh` end-to-end so stage D/E executes and any broadcast-JSON shape drift surfaces BEFORE steps 7/8 consume `deployments/` — record the receipts there as step 3's committed gas actuals (step-7 task 2 diffs against them) [round-2 note 1, routed]. Stage G source-verifies only MockBeacon + MockTokenImpl; the hull forwarders are unverifiable by construction (raw-runtime deploys) — stated in mock-token/README.md now [round-2 note 2, taken]. `deployments/README.md` pins 4663.json writers as 6/7 while deploy.sh accepts `--chain 4663`: per plan step 3 never runs there (task 5 targets 421614+46630; 4663 is step 7's, via the same script) and the merge writer cannot clobber — no action [round-2 note 3, no action].
 - Step 7 consumes this step: same deploy script for the 4663 core deploy, gas diffs vs these receipts, and the receipts eventually assert what the native tests cannot (probe→target wiring, zero-movement on all five revert paths — round 1 findings 2+3 deferrals).
 - Events/beacon/consumers: unchanged from round 1 — `packages/shared/events.ts` topics; record.reason = keccak256(utf8(reason)), full text rides Revoke; guard skips (never reverts) on extraction failure, GUARD_IMPL_MISMATCH only on successful mismatching resolution.
 
