@@ -2,6 +2,7 @@
 
 status:     merged
 branch:     step-4-scan-backend
+reconciled: 2026-09-20 (folded into plans 7–10 — commits 4b52e6a + 7283ffa; record: reconciliation/2026-09-20-steps-3-4-and-6-findings.md; judge 2026-09-20: 2 gaps, both fixed, accepted; R3-N1/R3-N2 stay coordinator-carried — no step 7–10 touches scan-backend; this main copy is canonical — /tmp/step4-wt diffed identical, prunable)
 deployed:   https://vetted-scan-backend.dujar-coding.workers.dev — main 559344c, worker version 0ccf8c68 (2026-09-20); /health + /watchdog live-green; P-VERIFIED receipt pending a calm rate window (below)
 branch:     step-4-scan-backend
 deployed:   PRE-FIX bundle live at https://vetted-scan-backend.dujar-coding.workers.dev (deployed 2026-09-20 from merged main ebaa61c, version 34d865dd; redeploy required after the probe-evidence fix below merges)

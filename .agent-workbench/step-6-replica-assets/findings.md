@@ -2,7 +2,7 @@
 
 status:     merged
 branch:     step-6-replica-assets (merged into main as 8c80aad via --no-ff; merge suite green on main: forge 14/14, contracts wasm+native, scan-backend 3, shared 15, frontend 84; pushed)
-reconciled:
+reconciled: 2026-09-20 (folded into plans 7–9 — commits 4b52e6a + 7283ffa; record: reconciliation/2026-09-20-steps-3-4-and-6-findings.md; judge 2026-09-20: 2 gaps, both fixed, accepted)
 deployed:   not deployed — 4663/46630/421614 addresses PENDING on funding (throwaway key 0x151e…8E4C read 0 wei on all three at close, 2026-09-19); deploy rehearsed green on local anvil; runbook in demo/assets.md + below
 
 ## What was built

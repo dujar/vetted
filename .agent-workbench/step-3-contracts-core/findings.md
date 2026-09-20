@@ -2,6 +2,7 @@
 
 status:     merged
 branch:     step-3-contracts-core
+reconciled: 2026-09-20 (folded into plans 7–8 — commits 4b52e6a + 7283ffa; record: reconciliation/2026-09-20-steps-3-4-and-6-findings.md; judge 2026-09-20: 2 gaps, both fixed, accepted)
 deployed:   not deployed — operator key 0x151e9f57F31310aFeBBB60c222c14badCf938E4C has balance 0 on 421614, 46630 and 4663 (cast balance, 2026-09-20); the task 5/6 on-chain RUN and its receipts stay deferred per the standing dispatch (code + script are landed and validated as far as funds allow)
 
 ## What was built
