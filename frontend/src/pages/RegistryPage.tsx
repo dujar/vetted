@@ -11,6 +11,7 @@ import { Skeleton } from "../components/Skeleton";
 import { explorerTx } from "../components/VerdictCard";
 import { VERDICT_VARIANT, type Verdict } from "../components/verdicts";
 import { getRegistrySource, type RegistryRow, type RegistrySource } from "../lib/registry";
+import { VETTED_CHAIN } from "../lib/chains";
 import { decodeBytes32, formatDate, shortAddr } from "../lib/format";
 
 /** Path reserved by step 7 (its plan links the registry page to exactly this). */
@@ -21,14 +22,19 @@ type Phase =
   | { s: "ready"; rows: RegistryRow[] }
   | { s: "degraded"; rows: RegistryRow[] };
 
-export function RegistryPage({ source = getRegistrySource() }: { source?: RegistrySource }) {
+// Lazy module singleton — a per-render default would re-fire the load effect
+// every cycle (infinite loop in the browser; found by e2e).
+let defaultSource: RegistrySource | null = null;
+const sourceDefault = (): RegistrySource => (defaultSource ??= getRegistrySource());
+
+export function RegistryPage({ source = sourceDefault() }: { source?: RegistrySource }) {
   const [phase, setPhase] = useState<Phase>({ s: "loading" });
   const [openRow, setOpenRow] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
     source
-      .rows(4663)
+      .rows(VETTED_CHAIN.id)
       .then((rows) => {
         if (alive) setPhase({ s: "ready", rows });
       })
@@ -76,7 +82,7 @@ export function RegistryPage({ source = getRegistrySource() }: { source?: Regist
               onClick={(e) => {
                 e.preventDefault();
                 setPhase({ s: "loading" });
-                void source.rows(4663).then((rows) => setPhase({ s: "ready", rows }));
+                void source.rows(VETTED_CHAIN.id).then((rows) => setPhase({ s: "ready", rows }));
               }}
             >
               Retry
