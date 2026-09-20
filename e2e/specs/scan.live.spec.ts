@@ -14,6 +14,7 @@ import { expect, test, type Page } from "@playwright/test";
 import {
   FIXTURES,
   RETRY_BACKOFF_MS,
+  RETRY_MAX_ATTEMPTS,
   WORKER_URL,
 } from "../fixtures/constants";
 import { SCRATCH, SERVER_CHAIN_ID } from "../fixtures/scratch";
@@ -36,6 +37,21 @@ const fulfillScan = (status: number, payload: unknown) => ({
   contentType: "application/json",
   body: JSON.stringify(payload),
 });
+
+/**
+ * Honest-degrade retry policy (constants: RETRY_BACKOFF_MS / RETRY_MAX_ATTEMPTS):
+ * while the scan keeps landing in a retryable state, back off and retry the SAME
+ * address — up to RETRY_MAX_ATTEMPTS. Deterministic routes exit on the first
+ * retry; against the flaky live worker this is the real policy.
+ */
+async function retryScanUntilSettled(page: Page): Promise<void> {
+  for (let attempt = 1; attempt <= RETRY_MAX_ATTEMPTS; attempt += 1) {
+    const retry = page.getByRole("link", { name: "Retry scan" });
+    if ((await retry.count()) === 0) return;
+    await page.waitForTimeout(RETRY_BACKOFF_MS * attempt);
+    await retry.first().click();
+  }
+}
 
 test.describe("J1 unhappy paths against the live wire (route-forced)", () => {
   test("progress lines render in order while the scan is in flight; degraded payload → banner", async ({ page }) => {
@@ -74,8 +90,10 @@ test.describe("J1 unhappy paths against the live wire (route-forced)", () => {
     const banner = page.getByRole("alert").filter({ hasText: "Issuer canonical list unreachable" });
     await expect(banner).toBeVisible();
     await expect(page.locator("section.panel").getByText("UNVERIFIED", { exact: true })).toBeVisible();
-    // The degrade sentinel: the widget shows count-unavailable, never a measured zero.
-    await expect(page.getByText("0", { exact: true })).toBeVisible();
+    // The degrade sentinel: the widget shows count-unavailable (runs: 0 WITH a
+    // provenance URL), never a measured zero — scoped to the watchdog panel.
+    const watchdog = page.locator(".panel", { hasText: "sequencer filterer — censorship watchdog" });
+    await expect(watchdog.getByText("0", { exact: true })).toBeVisible();
   });
 
   test("RPC_RETRYABLE → backoff retry policy recovers the verdict (worker 503 then success)", async ({ page }) => {
@@ -97,9 +115,9 @@ test.describe("J1 unhappy paths against the live wire (route-forced)", () => {
     // First attempt fails hard (fetch throw): the retryable error state.
     await expect(page.getByText("rpc unreachable").first()).toBeVisible();
 
-    // Honest-degrade policy: backoff, then retry the SAME address.
-    await page.waitForTimeout(RETRY_BACKOFF_MS);
-    await page.getByRole("link", { name: "Retry scan" }).click();
+    // Honest-degrade policy: backoff, then retry the SAME address — the
+    // deterministic route recovers on the first retry (request count pinned).
+    await retryScanUntilSettled(page);
     await expect(page.locator("section.panel").getByText("VERIFIED", { exact: true })).toBeVisible();
     expect(scans).toBe(2);
   });

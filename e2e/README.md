@@ -29,10 +29,11 @@ npx playwright test --project=live   # route-forced live-wire pass
 ```
 
 Servers (both add `VITE_E2E_STUB_WALLET=1`, the wagmi injected() e2e seam — no
-product build sets it):
+product build sets it; ports are env-overridable via `VETTED_E2E_MOCK_PORT` /
+`VETTED_E2E_LIVE_PORT` for parallel builders on this machine):
 
-- **mock :4173** — `VITE_API_MODE` unset → fixture-backed app.
-- **live :4174** — `VITE_API_MODE=live` + `VITE_API_URL` (step-4 worker). When
+- **mock :4883** — `VITE_API_MODE` unset → fixture-backed app.
+- **live :4884** — `VITE_API_MODE=live` + `VITE_API_URL` (step-4 worker). When
   a funded scratch deployment exists, the loader ALSO bakes
   `VITE_CHAIN_ID` / `VITE_REGISTRY_ADDRESS` / `VITE_GUARD_ADDRESS` /
   `VITE_REGISTRY_TOKENS` from `deployments/*.json` — the live J2/J3 UI path.

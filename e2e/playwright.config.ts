@@ -1,9 +1,9 @@
 /**
  * Playwright config (plan task 1) — two always-built servers over the real
  * frontend bundle:
- *   · mock  (port 4173) — fixture-backed app (VITE_API_MODE unset = mock), the
+ *   · mock  (port 4883) — fixture-backed app (VITE_API_MODE unset = mock), the
  *     default project; runs offline-capable against the golden fixtures.
- *   · live  (port 4174) — VITE_API_MODE=live + the step-4 worker URL, plus the
+ *   · live  (port 4884) — VITE_API_MODE=live + the step-4 worker URL, plus the
  *     e2e wallet seam. When a FUNDED scratch deployment exists
  *     (deployments/46630.json or 421614.json), the bundle is re-pointed at it
  *     (VITE_CHAIN_ID + VITE_REGISTRY_TOKENS — the live J2/J3 path); otherwise

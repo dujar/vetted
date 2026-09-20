@@ -16,9 +16,11 @@
 #   2. registry: verify(replica); verify(tokenB) then revoke(tokenB, …)
 #   3. token plumbing for the J2 settle: buyer tokenIn balance+allowance,
 #      MM tokenOut balance+allowance (verify loose end 8)
-#   4. the red-flag states, in the order the spec replays them:
-#      NO_RECORD (twin) → RECORD_REVOKED (tokenB) → PAUSED (tokenA)
-#      → IMPL_MISMATCH (shared mock beacon → implV2) → BLOCKLISTED (buyer, last)
+#   4. the red-flag states, in the order the spec replays them — guard order
+#      is record → paused → blocklist → impl-match, so IMPL_MISMATCH lands
+#      BEFORE PAUSED (once paused, GUARD_PAUSED always preempts):
+#      NO_RECORD (twin) → RECORD_REVOKED (tokenB) → IMPL_MISMATCH (shared mock
+#      beacon → implV2) → PAUSED (tokenA) → BLOCKLISTED (buyer, last)
 #   5. writes e2e/.scratch-state.json — the gated spec's data file
 set -euo pipefail
 
@@ -33,7 +35,10 @@ case "$CHAIN" in
 esac
 
 command -v cast >/dev/null || { echo "foundry's cast is required (scripts/toolchain.sh)" >&2; exit 1; }
-: "${DEPLOY_KEY:?set DEPLOY_KEY (the registrar — step 3's deploy key)}"
+# NOTE: no apostrophes inside the ${VAR:?…} expansions — bash treats them as
+# quote characters there (found by bash -n; the script is funding-gated so it
+# had never been parsed on a real run).
+: "${DEPLOY_KEY:?set DEPLOY_KEY (the registrar — the step-3 deploy key)}"
 
 [ -f "$DEP" ] || { echo "missing $DEP — run the funded step-3/step-6 deploys first (e2e/README.md)" >&2; exit 1; }
 STATUS=$(jq -r '.status' "$DEP"); [ "$STATUS" = "deployed" ] || { echo "$DEP status=$STATUS — not a funded deploy" >&2; exit 1; }
